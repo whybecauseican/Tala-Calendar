@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="color_login_button">#0097b2</color>
+    <color name="color_login_buttonpress">#007c91</color>
+    <color name="color_signup_button">#F2F2F2</color>
+    <color name="color_signup_buttonpress">#EBEBEB</color>
 </resources>
