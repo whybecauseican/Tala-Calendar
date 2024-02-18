@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.material.textfield.TextInputEditText;
 
 public class SignUp extends AppCompatActivity {
@@ -46,15 +47,15 @@ public class SignUp extends AppCompatActivity {
                     String password = pwdInput.getText().toString();
 
                     Boolean checkemail = db.checkemail(email); //runs the checkemail function in the dbhelper class
-                    if (checkemail == false){
+                    if (checkemail == false) {
                         Boolean insert = db.insertData(email, username, password); //runs the insertdata function in the dbhelper class
                         if (insert == true) {
                             Intent i = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(i);
-                        }else {
+                        } else {
                             Toast.makeText(SignUp.this, "Something went wrong. Please try again later", Toast.LENGTH_SHORT).show();
                         }
-                    }else{
+                    } else {
                         Toast.makeText(SignUp.this, "Email already exist! Please enter a different email", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -84,7 +85,7 @@ public class SignUp extends AppCompatActivity {
             return false;
         }
 
-        if (!pwdInput.getText().toString().equals( retypepwdInput.getText().toString())) {
+        if (!pwdInput.getText().toString().equals(retypepwdInput.getText().toString())) {
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
             return false;
         }

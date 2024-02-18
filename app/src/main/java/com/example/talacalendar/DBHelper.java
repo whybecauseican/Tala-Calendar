@@ -36,32 +36,32 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public Boolean insertData( String email, String username, String pass) {
+    public Boolean insertData(String email, String username, String pass) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("email", email);
         cv.put("username", username);
         cv.put("password", pass);
         long result = db.insert("users", null, cv);
-        if(result==-1)
+        if (result == -1)
             return false;
         else
             return true;
     }
 
-    public Boolean checkemail(String email){ //checks if email exists in the database
+    public Boolean checkemail(String email) { //checks if email exists in the database
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE email = ?",new String[] {email});
-        if(cursor.getCount() > 0) {
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE email = ?", new String[]{email});
+        if (cursor.getCount() > 0) {
             return true;
-        }else
+        } else
             return false;
     }
 
-    public Boolean checkemailpass(String email, String password){ //checks if email and password combination exists in the database
+    public Boolean checkemailpass(String email, String password) { //checks if email and password combination exists in the database
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE email = ? AND password = ?", new String[]{email, password});
-        if(cursor.getCount() > 0)
+        if (cursor.getCount() > 0)
             return true;
         else
             return false;

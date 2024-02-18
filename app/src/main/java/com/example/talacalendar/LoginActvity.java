@@ -52,7 +52,7 @@ public class LoginActvity extends AppCompatActivity {
                 }else{
                     Boolean checkemailpass = db.checkemailpass(email, pwd);
                     if (checkemailpass == true){
-                        Intent i = new Intent(LoginActvity.this,MainActivity.class);
+                        Intent i = new Intent(LoginActvity.this, MainActivity.class);
                         startActivity(i);
                     }else{
                         Toast.makeText(LoginActvity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
