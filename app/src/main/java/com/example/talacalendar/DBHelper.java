@@ -39,31 +39,22 @@ public class DBHelper extends SQLiteOpenHelper {
     public Boolean insertData(String email, String username, String pass) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put("email", email);
-        cv.put("username", username);
-        cv.put("password", pass);
+        cv.put(COLUMN_EMAIL, email);
+        cv.put(COLUMN_USER_NAME, username);
+        cv.put(COLUMN_PASSWORD, pass);
         long result = db.insert("users", null, cv);
-        if (result == -1)
-            return false;
-        else
-            return true;
+        return result != -1;
     }
 
     public Boolean checkemail(String email) { //checks if email exists in the database
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE email = ?", new String[]{email});
-        if (cursor.getCount() > 0) {
-            return true;
-        } else
-            return false;
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_EMAIL + " = ?", new String[]{email});
+        return cursor.getCount() > 0;
     }
 
     public Boolean checkemailpass(String email, String password) { //checks if email and password combination exists in the database
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE email = ? AND password = ?", new String[]{email, password});
-        if (cursor.getCount() > 0)
-            return true;
-        else
-            return false;
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_EMAIL + " = ? AND " + COLUMN_PASSWORD + " = ?", new String[]{email, password});
+        return cursor.getCount() > 0;
     }
 }

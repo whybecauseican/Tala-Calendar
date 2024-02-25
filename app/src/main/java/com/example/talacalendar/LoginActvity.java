@@ -44,27 +44,7 @@ public class LoginActvity extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = mail.getText().toString();
-                String pwd = pass.getText().toString();
-
-                if(email.isEmpty() || pwd.isEmpty()){
-                    Toast.makeText(LoginActvity.this, "Please enter all fields", Toast.LENGTH_SHORT).show();
-                }else{
-                    Boolean checkemailpass = db.checkemailpass(email, pwd);
-                    if (checkemailpass == true){
-                        Intent i = new Intent(LoginActvity.this, MainActivity.class);
-                        startActivity(i);
-                    }else{
-                        Toast.makeText(LoginActvity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
-
-        rememberMe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
+                login();
             }
         });
 
@@ -89,5 +69,25 @@ public class LoginActvity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void login() {
+        String email = mail.getText().toString();
+        String pwd = pass.getText().toString();
+
+        if(email.isEmpty() || pwd.isEmpty()){
+            Toast.makeText(LoginActvity.this, "Please enter all fields", Toast.LENGTH_SHORT).show();
+        }else{
+            Boolean checkemailpass = db.checkemailpass(email, pwd);
+            if (checkemailpass == true){
+                SessionManager sessionManager = new SessionManager(LoginActvity.this);
+                sessionManager.saveSession(email);
+
+                Intent i = new Intent(LoginActvity.this, MainActivity.class);
+                startActivity(i);
+            }else{
+                Toast.makeText(LoginActvity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

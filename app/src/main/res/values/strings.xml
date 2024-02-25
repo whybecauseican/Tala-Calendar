@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TalaCalendar</string>
-
+    <string name="open_nav">Open Navigation Drawer</string>
+    <string name="close_nav">Close Navigation Drawer</string>
     <string name="terms_and_privacy_text">
         By continuing, you agree to our <font color="#0097b2"><b>Terms of Service</b></font> and <font color="#0097b2"><b>Privacy Policy</b></font>
     </string>

@@ -40,7 +40,6 @@ public class SignUp extends AppCompatActivity {
         createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (validateInputs()) {
                     String email = emailInput.getText().toString();
                     String username = usernameInput.getText().toString();
@@ -50,7 +49,8 @@ public class SignUp extends AppCompatActivity {
                     if (checkemail == false) {
                         Boolean insert = db.insertData(email, username, password); //runs the insertdata function in the dbhelper class
                         if (insert == true) {
-                            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                            Intent i = new Intent(getApplicationContext(), LoginActvity.class);
+                            i.setFlags(i.FLAG_ACTIVITY_CLEAR_TASK | i.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(i);
                         } else {
                             Toast.makeText(SignUp.this, "Something went wrong. Please try again later", Toast.LENGTH_SHORT).show();
@@ -66,6 +66,7 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SignUp.this, LoginActvity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
         });
