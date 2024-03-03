@@ -8,28 +8,28 @@ public class SessionManager {
     private SharedPreferences.Editor editor;
     private static final String PREF_NAME = "session";
     private static final String SESSION_KEY = "session_user";
-    private static final String DEFAULT_EMAIL = "";
+    private static final int DEFAULT_USER_ID = -1;
 
     public SessionManager(Context context) {
         pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = pref.edit();
     }
 
-    public void saveSession(String email) {
-        editor.putString(SESSION_KEY, email);
+    public void saveSession(int userId) {
+        editor.putInt(SESSION_KEY, userId);
         editor.apply();
     }
 
-    public String getSession() {
-        return pref.getString(SESSION_KEY, DEFAULT_EMAIL);
-    } //return email else default email
+    public int getSession() {
+        return pref.getInt(SESSION_KEY, DEFAULT_USER_ID);
+    }
 
     public boolean isLoggedIn() {
-        return !getSession().equals(DEFAULT_EMAIL);
+        return getSession() != DEFAULT_USER_ID;
     }
 
     public void removeSession() {
-        editor.putString(SESSION_KEY, DEFAULT_EMAIL);
+        editor.putInt(SESSION_KEY, DEFAULT_USER_ID);
         editor.apply();
     }
 }

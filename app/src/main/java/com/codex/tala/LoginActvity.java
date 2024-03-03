@@ -93,13 +93,15 @@ public class LoginActvity extends AppCompatActivity {
 
         boolean isValidCredentials = db.checkemailpass(email, pwd);
         if (isValidCredentials) {
+            int userid = db.getUserId(email,pwd);
             if (rememberCond) {
                 SessionManager sessionManager = new SessionManager(LoginActvity.this);
-                sessionManager.saveSession(email);
+                sessionManager.saveSession(userid);
             }
 
             Intent intent = new Intent(LoginActvity.this, MainActivity.class);
             intent.putExtra("email", email);
+            intent.putExtra("userId", userid);
             startActivity(intent);
             finish();
         } else {

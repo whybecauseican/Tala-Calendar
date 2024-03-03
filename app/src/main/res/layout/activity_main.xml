@@ -11,19 +11,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <include
-            android:id="@+id/fab_layout"
-            layout="@layout/fab_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/color_login_button"
+            android:background="@color/color_main_darkcyan"
             android:elevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,6 +30,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
+        <include
+            android:id="@+id/fab_layout"
+            layout="@layout/fab_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -46,8 +46,8 @@
         android:id="@+id/nav_drawer"
         android:layout_gravity="start"
         android:background="@color/white"
-        app:itemIconTint="@color/color_login_button"
-        app:itemTextColor="@color/color_login_button"
+        app:itemIconTint="@color/color_main_darkcyan"
+        app:itemTextColor="@color/color_main_darkcyan"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_menu"/>
 

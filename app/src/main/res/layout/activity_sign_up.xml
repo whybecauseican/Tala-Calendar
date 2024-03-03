@@ -14,7 +14,7 @@
         android:layout_marginTop="40dp"
         android:layout_marginBottom="10dp"
         android:text="Sign Up"
-        android:textColor="@color/color_login_button"
+        android:textColor="@color/color_main_darkcyan"
         android:textSize="30sp"
         android:textStyle="bold" />
 
@@ -179,7 +179,7 @@
             android:clickable="true"
             android:text="Sign in"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/color_login_button"
+            android:textColor="@color/color_main_darkcyan"
             android:textStyle="bold"
             android:typeface="serif" />
     </RelativeLayout>

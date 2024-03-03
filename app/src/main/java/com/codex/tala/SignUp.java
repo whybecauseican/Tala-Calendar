@@ -47,7 +47,7 @@ public class SignUp extends AppCompatActivity {
 
                     Boolean checkemail = db.checkemail(email); //runs the checkemail function in the dbhelper class
                     if (checkemail == false) {
-                        Boolean insert = db.insertData(email, username, password); //runs the insertdata function in the dbhelper class
+                        Boolean insert = db.insertUsersData(email, username, password); //runs the insertdata function in the dbhelper class
                         if (insert == true) {
                             finish();
                         } else {

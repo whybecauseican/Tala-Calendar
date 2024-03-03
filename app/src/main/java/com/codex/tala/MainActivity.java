@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private View headerView;
     private TextView textViewUsername, textViewEmail;
     private String emailString;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         decorView.setSystemUiVisibility(uiOptions);
 
         emailString = getIntent().getStringExtra("email"); //return null if empty
+        userId = getIntent().getIntExtra("userId", -1);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -63,9 +65,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         db = new DBHelper(this);
         FAB = new FABHandler(this);
 
-        if (emailString != null || sessionManager.isLoggedIn()){ //is set to if not null so database checks wouldnt return error
-            if (emailString == null){
-                emailString = sessionManager.getSession();
+        if (userId != -1 || sessionManager.isLoggedIn()){ //is set to if not null so database checks wouldnt return error
+            if (userId == -1){
+                userId = sessionManager.getSession();
             }
             setNavHeaders();
             setupBtnClickListeners();
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onStart();
 
         boolean isLoggedin = sessionManager.isLoggedIn();
-        if (isLoggedin == false && emailString == null){ // TODO: 26/02/2024 change loginactivity.class to whatever class is the login and register page is
+        if (isLoggedin == false && userId == -1){ // TODO: 26/02/2024 change loginactivity.class to whatever class is the login and register page is
             Intent i = new Intent(MainActivity.this, LoginActvity.class);
             startActivity(i);
             finish();
@@ -110,8 +112,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         add_cal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Add_cal clicked", Toast.LENGTH_SHORT).show();
                 FAB.onButtonClicked();
+                Intent intent = new Intent(MainActivity.this, EventAddActivity.class);
+                intent.putExtra("userId", userId);
+                startActivity(intent);
+                overridePendingTransition(R.anim.from_bottom_anim,0);
             }
         });
         talk_ai.setOnClickListener(new View.OnClickListener() {
@@ -132,6 +137,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             openFragment(new WeekFragment());
         } else if (itemId == R.id.day_view) {
             openFragment(new DayFragment());
+        } else if (itemId == R.id.about_us) {
+            Intent intent = new Intent(MainActivity.this, AboutUsActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_left,0);
         } else if (itemId == R.id.logout_btn) {
             sessionManager.removeSession();
             Intent i = new Intent(MainActivity.this, LoginActvity.class);

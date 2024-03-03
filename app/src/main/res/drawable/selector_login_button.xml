@@ -22,7 +22,7 @@
                 android:bottomLeftRadius="@dimen/login_button_radius">
             </corners>
             <solid
-                android:color="@color/color_login_button">
+                android:color="@color/color_main_darkcyan">
             </solid>
         </shape>
     </item>

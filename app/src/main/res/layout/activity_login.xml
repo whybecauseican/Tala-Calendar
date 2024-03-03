@@ -91,7 +91,7 @@
                 android:layout_toEndOf="@id/rememberSwitch"
                 android:fontFamily="sans-serif"
                 android:text="Remember Me"
-                android:textColor="@color/color_login_button"
+                android:textColor="@color/color_main_darkcyan"
                 android:textSize="12sp" />
         </RelativeLayout>
 
@@ -104,7 +104,7 @@
             android:clickable="true"
             android:fontFamily="sans-serif"
             android:text="Forgot Password?"
-            android:textColor="@color/color_login_button"
+            android:textColor="@color/color_main_darkcyan"
             android:textSize="12sp"
             android:textStyle="normal" />
 
@@ -137,7 +137,7 @@
             android:clickable="true"
             android:text="Sign up"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/color_login_button"
+            android:textColor="@color/color_main_darkcyan"
             android:textStyle="bold"
             android:typeface="serif" />
 
@@ -185,7 +185,7 @@
         android:fontFamily="sans-serif-black"
         android:text="Welcome Back !"
         android:textAlignment="viewStart"
-        android:textColor="@color/color_login_button"
+        android:textColor="@color/color_main_darkcyan"
         android:textSize="34sp"
         android:textStyle="bold" />
 
