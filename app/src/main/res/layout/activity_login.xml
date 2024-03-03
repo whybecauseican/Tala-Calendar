@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".LoginActvity"
     android:background="#FFFFFF"
     android:orientation="vertical">
 
@@ -21,74 +22,43 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/Tala_logo"
         android:layout_marginTop="20sp"
+        android:paddingTop="10dp"
         android:paddingLeft="30dp"
-        android:paddingTop="30dp"
         android:paddingRight="30dp"
         android:paddingBottom="10dp">
 
-        <ImageView
-            android:id="@+id/mainImageView1"
-            android:layout_width="@dimen/login_holder_height"
-            android:layout_height="@dimen/login_holder_height"
-            android:layout_marginBottom="30dp"
-            android:src="@drawable/user_icon"
-            app:tint="#0097b2" />
-
-        <ImageView
-            android:id="@+id/mainImageView2"
-            android:layout_width="@dimen/login_holder_height"
-            android:layout_height="@dimen/login_holder_height"
-            android:layout_below="@id/mainImageView1"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/password_icon"
-            app:tint="#0097b2" />
-
-        <EditText
-            android:id="@+id/email_editText"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/emailLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/mainImageView1"
-            android:layout_alignBottom="@id/mainImageView1"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/mainImageView1"
-            android:background="@null"
-            android:ems="10"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/color_login_button"
-            android:textSize="20sp"
-            android:typeface="serif" />
+            android:hint="Email">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/email_editText"
-            android:layout_marginTop="@dimen/login_horizontalline_spacing"
-            android:background="#CCCCCC" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/email_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:inputType="text"></com.google.android.material.textfield.TextInputEditText>
 
-        <EditText
-            android:id="@+id/password_editText"
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/paswwordLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/mainImageView2"
-            android:layout_alignBottom="@id/mainImageView2"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/mainImageView2"
-            android:background="@null"
-            android:ems="10"
+            android:layout_below="@id/emailLayout"
             android:hint="Password"
-            android:inputType="textPassword"
-            android:textColor="@color/color_login_button"
-            android:textSize="20sp"
-            android:typeface="serif" />
+            app:passwordToggleEnabled="true">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/password_editText"
-            android:layout_marginTop="@dimen/login_horizontalline_spacing"
-            android:background="#CCCCCC" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/password_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
 
+                android:layout_marginBottom="10dp"
+                android:inputType="textPassword"></com.google.android.material.textfield.TextInputEditText>
+
+        </com.google.android.material.textfield.TextInputLayout>
     </RelativeLayout>
 
     <RelativeLayout

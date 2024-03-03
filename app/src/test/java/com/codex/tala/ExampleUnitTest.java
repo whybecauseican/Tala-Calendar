@@ -1,4 +1,4 @@
-package com.example.talacalendar;
+package com.codex.tala;
 
 import org.junit.Test;
 

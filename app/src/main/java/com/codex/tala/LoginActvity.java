@@ -1,4 +1,4 @@
-package com.example.talacalendar;
+package com.codex.tala;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,6 +21,7 @@ public class LoginActvity extends AppCompatActivity {
     private ImageView googleSignInBtn;
 
     private DBHelper db;
+    private Boolean rememberCond;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +43,12 @@ public class LoginActvity extends AppCompatActivity {
         googleSignInBtn = (ImageView) findViewById(R.id.google_Btn);
         db = new DBHelper(this);
 
+        rememberCond = false;
+
         rememberMe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                rememberCond = isChecked;
             }
         });
 
@@ -80,22 +83,28 @@ public class LoginActvity extends AppCompatActivity {
     }
 
     private void login() {
-        String email = mail.getText().toString();
+        String email = mail.getText().toString().trim();
         String pwd = pass.getText().toString();
 
-        if(email.isEmpty() || pwd.isEmpty()){
+        if (email.isEmpty() || pwd.isEmpty()) {
             Toast.makeText(LoginActvity.this, "Please enter all fields", Toast.LENGTH_SHORT).show();
-        }else{
-            Boolean checkemailpass = db.checkemailpass(email, pwd);
-            if (checkemailpass == true){
+            return;
+        }
+
+        boolean isValidCredentials = db.checkemailpass(email, pwd);
+        if (isValidCredentials) {
+            if (rememberCond) {
                 SessionManager sessionManager = new SessionManager(LoginActvity.this);
                 sessionManager.saveSession(email);
-
-                Intent i = new Intent(LoginActvity.this, MainActivity.class);
-                startActivity(i);
-            }else{
-                Toast.makeText(LoginActvity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
             }
+
+            Intent intent = new Intent(LoginActvity.this, MainActivity.class);
+            intent.putExtra("email", email);
+            startActivity(intent);
+            finish();
+        } else {
+            Toast.makeText(LoginActvity.this, "Invalid email and/or password", Toast.LENGTH_SHORT).show();
         }
     }
+
 }

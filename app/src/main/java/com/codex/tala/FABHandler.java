@@ -1,4 +1,4 @@
-package com.example.talacalendar;
+package com.codex.tala;
 
 import android.view.View;
 import android.view.animation.Animation;

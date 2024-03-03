@@ -1,4 +1,4 @@
-package com.example.talacalendar;
+package com.codex.tala;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,7 +22,7 @@ public class SessionManager {
 
     public String getSession() {
         return pref.getString(SESSION_KEY, DEFAULT_EMAIL);
-    }
+    } //return email else default email
 
     public boolean isLoggedIn() {
         return !getSession().equals(DEFAULT_EMAIL);
