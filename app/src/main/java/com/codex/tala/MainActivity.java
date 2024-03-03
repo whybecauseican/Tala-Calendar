@@ -1,12 +1,9 @@
-package com.example.talacalendar;
+package com.codex.tala;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,14 +22,17 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-    private DrawerLayout drawerLayout;
+    private DBHelper db;
+    private SessionManager sessionManager;
     private FragmentManager fragmentManager;
+    private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private FloatingActionButton add_btn, add_cal, talk_ai;
     private FABHandler FAB;
-    private DBHelper db;
-    private SessionManager sessionManager;
+    private NavigationView navigationView;
+    private View headerView;
+    private TextView textViewUsername, textViewEmail;
+    private String emailString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +45,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
 
+        emailString = getIntent().getStringExtra("email"); //return null if empty
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
@@ -54,17 +56,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_drawer);
-        navigationView.setNavigationItemSelectedListener(this);
-
         fragmentManager = getSupportFragmentManager();
         openFragment(new MonthFragment());
 
-        FAB = new FABHandler(this);
+        sessionManager = new SessionManager(MainActivity.this);
         db = new DBHelper(this);
+        FAB = new FABHandler(this);
 
+        if (emailString != null || sessionManager.isLoggedIn()){ //is set to if not null so database checks wouldnt return error
+            if (emailString == null){
+                emailString = sessionManager.getSession();
+            }
+            setNavHeaders();
+            setupBtnClickListeners();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        boolean isLoggedin = sessionManager.isLoggedIn();
+        if (isLoggedin == false && emailString == null){ // TODO: 26/02/2024 change loginactivity.class to whatever class is the login and register page is
+            Intent i = new Intent(MainActivity.this, LoginActvity.class);
+            startActivity(i);
+            finish();
+        }
+    }
+
+    private void setNavHeaders() {
+        navigationView = findViewById(R.id.nav_drawer);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        headerView = navigationView.getHeaderView(0);
+
+        textViewUsername = headerView.findViewById(R.id.nav_username);
+        textViewEmail = headerView.findViewById(R.id.nav_email);
+
+        textViewUsername.setText(db.getUsername(emailString));
+        textViewEmail.setText(emailString);
+    }
+
+    private void setupBtnClickListeners() {
         add_btn = findViewById(R.id.add_btn);
-        add_cal =findViewById(R.id.event_shortcut_btn);
+        add_cal = findViewById(R.id.event_shortcut_btn);
         talk_ai = findViewById(R.id.talk_ai_btn);
         add_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,20 +121,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 FAB.onButtonClicked();
             }
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        sessionManager = new SessionManager(MainActivity.this);
-        boolean isLoggedin = sessionManager.isLoggedIn();
-
-        if (isLoggedin == false){ // TODO: 26/02/2024 change loginactivity.class to whatever class is the login and register page is
-            Intent i = new Intent(MainActivity.this, LoginActvity.class);
-            startActivity(i);
-            finish();
-        }
     }
 
     @Override

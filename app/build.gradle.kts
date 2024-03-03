@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.talacalendar"
+    namespace = "com.codex.tala"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.talacalendar"
+        applicationId = "com.codex.tala"
         minSdk = 28
         targetSdk = 34
         versionCode = 1

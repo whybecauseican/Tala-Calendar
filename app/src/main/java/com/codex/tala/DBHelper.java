@@ -1,11 +1,10 @@
-package com.example.talacalendar;
+package com.codex.tala;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
 
 public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "Tala.db";
@@ -56,5 +55,37 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_EMAIL + " = ? AND " + COLUMN_PASSWORD + " = ?", new String[]{email, password});
         return cursor.getCount() > 0;
+    }
+
+    public String getUsername(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String username = "";
+
+        if (db == null) {
+            return null;
+        }
+
+        String[] projection = {COLUMN_USER_NAME};
+        String selection = COLUMN_EMAIL + " = ?";
+        String[] selectionArgs = {email};
+
+        Cursor cursor = db.query(TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+
+        try {
+            if (cursor.moveToFirst()) {
+                int usernameIndex = cursor.getColumnIndexOrThrow(COLUMN_USER_NAME);
+
+                username = cursor.getString(usernameIndex);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            cursor.close();
+        }
+
+        return username;
     }
 }

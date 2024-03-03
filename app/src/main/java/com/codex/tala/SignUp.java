@@ -1,4 +1,4 @@
-package com.example.talacalendar;
+package com.codex.tala;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -49,9 +49,7 @@ public class SignUp extends AppCompatActivity {
                     if (checkemail == false) {
                         Boolean insert = db.insertData(email, username, password); //runs the insertdata function in the dbhelper class
                         if (insert == true) {
-                            Intent i = new Intent(getApplicationContext(), LoginActvity.class);
-                            i.setFlags(i.FLAG_ACTIVITY_CLEAR_TASK | i.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(i);
+                            finish();
                         } else {
                             Toast.makeText(SignUp.this, "Something went wrong. Please try again later", Toast.LENGTH_SHORT).show();
                         }

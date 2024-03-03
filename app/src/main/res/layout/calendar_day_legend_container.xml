@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="SUN"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="MON"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="TUE"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="WED"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="THU"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="FRI"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="SAT"
+        android:textColor="@color/black"
+        android:textAlignment="center"
+        android:textSize="14sp"/>
+
+</LinearLayout>
