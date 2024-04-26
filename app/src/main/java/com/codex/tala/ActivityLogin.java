@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -13,7 +14,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LoginActvity extends AppCompatActivity {
+public class ActivityLogin extends AppCompatActivity {
     private EditText mail, pass;
     private TextView forgotPass, signUp;
     private Switch rememberMe;
@@ -69,7 +70,7 @@ public class LoginActvity extends AppCompatActivity {
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActvity.this, SignUp.class);
+                Intent intent = new Intent(ActivityLogin.this, ActivitySignUp.class);
                 startActivity(intent);
             }
         });
@@ -87,7 +88,7 @@ public class LoginActvity extends AppCompatActivity {
         String pwd = pass.getText().toString();
 
         if (email.isEmpty() || pwd.isEmpty()) {
-            Toast.makeText(LoginActvity.this, "Please enter all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivityLogin.this, "Please enter all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -95,17 +96,16 @@ public class LoginActvity extends AppCompatActivity {
         if (isValidCredentials) {
             int userid = db.getUserId(email,pwd);
             if (rememberCond) {
-                SessionManager sessionManager = new SessionManager(LoginActvity.this);
+                SessionManager sessionManager = new SessionManager(ActivityLogin.this);
                 sessionManager.saveSession(userid);
             }
-
-            Intent intent = new Intent(LoginActvity.this, MainActivity.class);
-            intent.putExtra("email", email);
+            Log.d("USERID IN LOGIN", String.valueOf(userid));
+            Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
             intent.putExtra("userId", userid);
             startActivity(intent);
             finish();
         } else {
-            Toast.makeText(LoginActvity.this, "Invalid email and/or password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivityLogin.this, "Invalid email and/or password", Toast.LENGTH_SHORT).show();
         }
     }
 

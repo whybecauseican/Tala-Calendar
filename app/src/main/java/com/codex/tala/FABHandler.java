@@ -15,7 +15,7 @@ public class FABHandler { //floating action button handler
 
     private boolean clicked = false;
 
-    public FABHandler(MainActivity activity) {
+    public FABHandler(ActivityMain activity) {
         rotateOpen = AnimationUtils.loadAnimation(activity, R.anim.rotate_open_anim);
         rotateClose = AnimationUtils.loadAnimation(activity, R.anim.rotate_close_anim);
         fromBottom = AnimationUtils.loadAnimation(activity, R.anim.from_bottom_anim);

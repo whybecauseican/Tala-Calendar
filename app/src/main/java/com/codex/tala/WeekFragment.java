@@ -24,6 +24,7 @@ import java.util.ArrayList;
 public class WeekFragment extends Fragment implements CalendarAdapter.OnItemListener{
     private TextView monthYearText;
     private RecyclerView calendarRecyclerView;
+    private int userId;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -33,6 +34,10 @@ public class WeekFragment extends Fragment implements CalendarAdapter.OnItemList
         CalendarUtils.selectedDate = (LocalDate) LocalDate.now();
         setWeekView();
         return view;
+    }
+
+    public WeekFragment(int userId) {
+        this.userId = userId;
     }
 
     private void initWidgets(View view)
@@ -45,7 +50,7 @@ public class WeekFragment extends Fragment implements CalendarAdapter.OnItemList
         monthYearText.setText(monthYearFromDate(CalendarUtils.selectedDate));
         ArrayList<LocalDate> days = daysInWeekArray(CalendarUtils.selectedDate);
 
-        CalendarAdapter calendarAdapter = new CalendarAdapter(CalendarUtils.selectedDate, days, this);
+        CalendarAdapter calendarAdapter = new CalendarAdapter(getContext(), userId, days, this);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 7);
         calendarRecyclerView.setAdapter(calendarAdapter);
         calendarRecyclerView.setLayoutManager(layoutManager);

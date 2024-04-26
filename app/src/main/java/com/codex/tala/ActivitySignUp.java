@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 
-public class SignUp extends AppCompatActivity {
+public class ActivitySignUp extends AppCompatActivity {
 
     private TextInputEditText usernameInput, emailInput, pwdInput, retypepwdInput;
     private TextView signin_btn;
@@ -51,10 +51,10 @@ public class SignUp extends AppCompatActivity {
                         if (insert == true) {
                             finish();
                         } else {
-                            Toast.makeText(SignUp.this, "Something went wrong. Please try again later", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ActivitySignUp.this, "Something went wrong. Please try again later", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(SignUp.this, "Email already exist! Please enter a different email", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ActivitySignUp.this, "Email already exist! Please enter a different email", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -63,7 +63,7 @@ public class SignUp extends AppCompatActivity {
         signin_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SignUp.this, LoginActvity.class);
+                Intent intent = new Intent(ActivitySignUp.this, ActivityLogin.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }

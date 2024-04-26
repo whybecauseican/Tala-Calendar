@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class SessionManager {
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
+    private final SharedPreferences pref;
+    private final SharedPreferences.Editor editor;
     private static final String PREF_NAME = "session";
     private static final String SESSION_KEY = "session_user";
     private static final int DEFAULT_USER_ID = -1;

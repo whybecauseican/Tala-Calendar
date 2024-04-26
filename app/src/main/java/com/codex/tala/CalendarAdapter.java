@@ -1,25 +1,32 @@
 package com.codex.tala;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class CalendarAdapter extends RecyclerView.Adapter <CalendarViewHolder> {
+    private final Context context;
     private final ArrayList<LocalDate> days;
     private final OnItemListener onItemListener;
-    private final LocalDate savedDate;
+    private DBHelper db;
+    private int userId;
 
-    public CalendarAdapter(LocalDate savedDate, ArrayList<LocalDate> days, OnItemListener onItemListener) {
+    public CalendarAdapter(Context context, int userId, ArrayList<LocalDate> days, OnItemListener onItemListener) {
         this.days = days;
         this.onItemListener = onItemListener;
-        this.savedDate = savedDate;
+        this.context = context;
+        this.db = new DBHelper(context);
+        this.userId = userId;
     }
 
     @NonNull
@@ -31,33 +38,37 @@ public class CalendarAdapter extends RecyclerView.Adapter <CalendarViewHolder> {
         if(days.size() > 15) //month view
             layoutParams.height = (int) (parent.getHeight() * 0.166666666);
         else
-            layoutParams.height = (int) parent.getHeight();
+            layoutParams.height = parent.getHeight();
         return new CalendarViewHolder(view, onItemListener, days);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CalendarViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CalendarViewHolder holder, int position) {//looping
         final LocalDate date = days.get(position);
 
-//        if (date != null) {
-//            LocalDate currentDate = LocalDate.of(savedDate.getYear(), savedDate.getMonth(), date.getDayOfMonth());
-//            if (currentDate.equals(LocalDate.now())) {
-//                holder.itemView.setBackgroundResource(R.drawable.calendar_today_bg);
-//                holder.dayOfMonth.setTextColor(Color.WHITE);
-//            } else if (!(currentDate.getMonth() == LocalDate.now().getMonth() &&
-//                    currentDate.getYear() == LocalDate.now().getYear()) &&
-//                    currentDate.withDayOfMonth(1).equals(currentDate)) {
-//                holder.itemView.setBackgroundResource(R.drawable.calendar_selected_bg);
-//                holder.dayOfMonth.setTextColor(Color.BLACK);
-//            }
-//        }
-
-        if (date == null)
+        if (date == null) {
             holder.dayOfMonth.setText("");
-        else {
+        } else {
             holder.dayOfMonth.setText(String.valueOf(date.getDayOfMonth()));
-            if (date.equals(CalendarUtils.selectedDate))
-                holder.parentView.setBackgroundResource(R.drawable.calendar_selected_bg);
+            if (date.equals(CalendarUtils.selectedDate)) {
+                if (date.equals(LocalDate.now())) {
+                    holder.itemView.setBackgroundResource(R.drawable.calendar_today_bg);
+                    holder.dayOfMonth.setTextColor(Color.WHITE);
+                } else {
+                    holder.parentView.setBackgroundResource(R.drawable.calendar_selected_bg);
+                }
+            } else if (date.equals(LocalDate.now())) {
+                int colorMainDarkCyan = ContextCompat.getColor(context, R.color.color_main_darkcyan);
+                holder.dayOfMonth.setTextColor(colorMainDarkCyan);
+            }
+
+            boolean eventExists = db.checkCalendarEventExists(userId, date);
+            if (eventExists) {
+                holder.cellDotView.setVisibility(View.VISIBLE);
+            } else {
+                holder.cellDotView.setVisibility(View.GONE);
+            }
+            db.close();
         }
     }
 

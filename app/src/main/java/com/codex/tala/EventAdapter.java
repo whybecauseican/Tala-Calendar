@@ -28,9 +28,20 @@ public class EventAdapter extends ArrayAdapter<Event> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.event_cell, parent, false);
 
         TextView eventCellTV = convertView.findViewById(R.id.eventCellTV);
+        TextView startTimeCellTV = convertView.findViewById(R.id.startTimeCellTV);
+        TextView endTimeCellTV = convertView.findViewById(R.id.endTimeCellTV);
 
-        String eventTitle = "Sleeper build";
+        String eventTitle = event.getName();
+        String eventSTTitle = event.getStartTime();
+        String eventETTitle;
+        if (event.getEndDate().equals(String.valueOf(CalendarUtils.selectedDate))) {
+            eventETTitle = event.getEndTime();
+        }else {
+            eventETTitle = "";
+        }
         eventCellTV.setText(eventTitle);
+        startTimeCellTV.setText(eventSTTitle);
+        endTimeCellTV.setText(eventETTitle);
         return convertView;
     }
 }

@@ -5,10 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import java.time.LocalDate;
 
 public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "Tala.db";
-
     public static final String TABLE_USERS = "users";
     public static final String COLUMN_USER_ID = "user_id";
     public static final String COLUMN_EMAIL = "email";
@@ -92,23 +94,27 @@ public class DBHelper extends SQLiteOpenHelper {
             userId = cursor.getInt(cursor.getColumnIndexOrThrow("user_id"));
         }
         cursor.close();
-
+        
         return userId;
     }
 
     public Boolean checkemail(String email) { //checks if email exists in the database
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE " + COLUMN_EMAIL + " = ?", new String[]{email});
-        return cursor.getCount() > 0;
+        boolean emailExists = cursor.getCount() > 0;
+        cursor.close();
+        return emailExists;
     }
 
     public Boolean checkemailpass(String email, String password) { //checks if email and password combination exists in the database
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE " + COLUMN_EMAIL + " = ? AND " + COLUMN_PASSWORD + " = ?", new String[]{email, password});
-        return cursor.getCount() > 0;
+        boolean emailExists = cursor.getCount() > 0;
+        cursor.close();
+        return emailExists;
     }
 
-    public Cursor getEventData(int userId) {
+    public Cursor getEventDataForDate(int userId, LocalDate date) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] projection = {
                 COLUMN_EVENT_TITLE,
@@ -117,40 +123,97 @@ public class DBHelper extends SQLiteOpenHelper {
                 COLUMN_START_TIME,
                 COLUMN_END_TIME
         };
-        String selection = COLUMN_USER_ID + " = ?";
-        String[] selectionArgs = {String.valueOf(userId)};
+        String selection = COLUMN_USER_ID + " = ? AND " +
+                "? BETWEEN " + COLUMN_START_DATE + " AND " + COLUMN_END_DATE;
+        String formattedDate = date.toString();
+        String[] selectionArgs = {String.valueOf(userId), formattedDate};
         return db.query(TABLE_EVENTS, projection, selection, selectionArgs, null, null, null);
     }
 
-    public String getUsername(String email) {
+    public String getUsername(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         String username = "";
 
-        if (db == null) {
+        if (db == null || userId == -1) {
             return null;
         }
 
         String[] projection = {COLUMN_USER_NAME};
-        String selection = COLUMN_EMAIL + " = ?";
-        String[] selectionArgs = {email};
+        String selection = COLUMN_USER_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(userId)};
 
-        Cursor cursor = db.query(TABLE_USERS, projection, selection, selectionArgs, null, null, null);
-        if (cursor == null) {
-            return null;
-        }
-
+        Cursor cursor = null;
         try {
-            if (cursor.moveToFirst()) {
+            cursor = db.query(TABLE_USERS, projection, selection, selectionArgs, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
                 int usernameIndex = cursor.getColumnIndexOrThrow(COLUMN_USER_NAME);
-
                 username = cursor.getString(usernameIndex);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            cursor.close();
+            if (cursor != null) {
+                cursor.close();
+            }
         }
 
         return username;
+    }
+
+    public String getEmail(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String email = "";
+
+        if (db == null || userId == -1) {
+            return null;
+        }
+
+        String[] projection = {COLUMN_EMAIL};
+        String selection = COLUMN_USER_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(userId)};
+
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_USERS, projection, selection, selectionArgs, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int emailIndex = cursor.getColumnIndexOrThrow(COLUMN_EMAIL);
+                email = cursor.getString(emailIndex);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return email;
+    }
+
+    public boolean checkCalendarEventExists(int userId, LocalDate date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        boolean eventExists = false;
+
+        if (db == null || date == null) {
+            return false;
+        }
+
+        String dateString = date.toString();
+        String[] projection = {COLUMN_EVENT_ID};
+        String selection = COLUMN_USER_ID + " = ? AND (? BETWEEN " + COLUMN_START_DATE + " AND " + COLUMN_END_DATE + ")";
+        String[] selectionArgs = {String.valueOf(userId), dateString};
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_EVENTS, projection, selection, selectionArgs, null, null, null);
+            eventExists = cursor != null && cursor.getCount() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return eventExists;
     }
 }

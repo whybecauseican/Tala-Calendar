@@ -29,6 +29,8 @@ public class MonthFragment extends Fragment implements CalendarAdapter.OnItemLis
     private TextView monthYearText;
     private RecyclerView calendarRecyclerView;
     private ListView eventListView;
+    private DBHelper db;
+    private int userId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,6 +44,10 @@ public class MonthFragment extends Fragment implements CalendarAdapter.OnItemLis
         return view;
     }
 
+    public MonthFragment(int userId){
+        this.userId = userId;
+    }
+
     private void initWidgets(View view)
     {
         calendarRecyclerView = (RecyclerView) view.findViewById(R.id.calendarRecyclerView);
@@ -52,8 +58,7 @@ public class MonthFragment extends Fragment implements CalendarAdapter.OnItemLis
     private void setMonthView() {
         monthYearText.setText(monthYearFromDate(CalendarUtils.selectedDate));
         ArrayList<LocalDate> daysInMonth = daysInMonthArray(CalendarUtils.selectedDate);
-
-        CalendarAdapter calendarAdapter = new CalendarAdapter(CalendarUtils.selectedDate, daysInMonth, this);
+        CalendarAdapter calendarAdapter = new CalendarAdapter(getContext(), userId, daysInMonth, this);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 7);
         calendarRecyclerView.setAdapter(calendarAdapter);
         calendarRecyclerView.setLayoutManager(layoutManager);
@@ -105,8 +110,9 @@ public class MonthFragment extends Fragment implements CalendarAdapter.OnItemLis
     }
 
     private void setEventAdapter() {
-        ArrayList<Event> dailyEvents = Event.eventsForDate(CalendarUtils.selectedDate);
-        EventAdapter eventAdapter = new EventAdapter(getContext().getApplicationContext(), dailyEvents);
+        db = new DBHelper(getContext());
+        ArrayList<Event> dailyEvents = Event.eventsForDate(db,userId,CalendarUtils.selectedDate); //all events that occured on the selectedDate
+        EventAdapter eventAdapter = new EventAdapter(getContext().getApplicationContext(), dailyEvents); //function to populate the listview with the events
         eventListView.setAdapter(eventAdapter);
     }
 }

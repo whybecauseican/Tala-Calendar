@@ -1,65 +1,61 @@
 package com.codex.tala;
 
+import android.database.Cursor;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class Event {
-    private DBHelper db;
     public static ArrayList<Event> eventsList = new ArrayList<>();
-
-    public static ArrayList<Event> eventsForDate(LocalDate date)
-    {
+    public static ArrayList<Event> eventsForDate(DBHelper db, int userId, LocalDate date) {
         ArrayList<Event> events = new ArrayList<>();
+        Cursor cursor = db.getEventDataForDate(userId, date);
 
-        for(Event event : eventsList)
-        {
-            if(event.getDate().equals(date))
-                events.add(event);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.COLUMN_EVENT_TITLE));
+                String startDate = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.COLUMN_START_DATE));
+                String endDate = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.COLUMN_END_DATE));
+                String startTime = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.COLUMN_START_TIME));
+                String endTime = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.COLUMN_END_TIME));
+
+                events.add(new Event(name, startDate, endDate, startTime, endTime));
+            } while (cursor.moveToNext());
+
+            cursor.close();
         }
 
         return events;
     }
 
+    private final String name, startDate, endDate, startTime, endTime;
 
-    private String name;
-    private LocalDate date;
-    private LocalTime time;
-
-    public Event(String name, LocalDate date, LocalTime time)
-    {
+    public Event(String name, String startDate, String endDate, String startTime, String endTime) {
         this.name = name;
-        this.date = date;
-        this.time = time;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
-        this.name = name;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public LocalDate getDate()
-    {
-        return date;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setDate(LocalDate date)
-    {
-        this.date = date;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public LocalTime getTime()
-    {
-        return time;
-    }
-
-    public void setTime(LocalTime time)
-    {
-        this.time = time;
+    public String getEndTime() {
+        return endTime;
     }
 }

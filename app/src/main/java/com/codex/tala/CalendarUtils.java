@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class CalendarUtils {
     public static LocalDate selectedDate;
@@ -61,5 +62,18 @@ public class CalendarUtils {
         return null;
     }
 
+    public static String convert12to24(String time12hr){
+        String[] parts = time12hr.split(":");
+        int hour = Integer.parseInt(parts[0]);
+        int minute = Integer.parseInt(parts[1].substring(0, 2));
+        String period = parts[1].substring(2).trim();
 
+        if (period.equals("PM") && hour != 12) {
+            hour += 12;
+        } else if (period.equals("AM") && hour == 12) {
+            hour = 0;
+        }
+
+        return String.format(Locale.ENGLISH,"%02d:%02d", hour, minute);
+    }
 }

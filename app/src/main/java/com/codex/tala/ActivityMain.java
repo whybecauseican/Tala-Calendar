@@ -2,6 +2,7 @@ package com.codex.tala;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -21,7 +22,9 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.Objects;
+
+public class ActivityMain extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DBHelper db;
     private SessionManager sessionManager;
     private FragmentManager fragmentManager;
@@ -32,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private View headerView;
     private TextView textViewUsername, textViewEmail;
-    private String emailString;
     private int userId;
 
     @Override
@@ -46,11 +48,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
 
-        emailString = getIntent().getStringExtra("email"); //return null if empty
         userId = getIntent().getIntExtra("userId", -1);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
@@ -58,17 +59,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        fragmentManager = getSupportFragmentManager();
-        openFragment(new MonthFragment());
-
-        sessionManager = new SessionManager(MainActivity.this);
+        sessionManager = new SessionManager(ActivityMain.this);
         db = new DBHelper(this);
         FAB = new FABHandler(this);
 
         if (userId != -1 || sessionManager.isLoggedIn()){ //is set to if not null so database checks wouldnt return error
             if (userId == -1){
-                userId = sessionManager.getSession();
+                userId = sessionManager.getSession(); //get userId from session if userId is null but isLoggedin which indicates userId is present but not stored
             }
+            fragmentManager = getSupportFragmentManager();
+            openFragment(new MonthFragment(userId));
+
             setNavHeaders();
             setupBtnClickListeners();
         }
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         boolean isLoggedin = sessionManager.isLoggedIn();
         if (isLoggedin == false && userId == -1){ // TODO: 26/02/2024 change loginactivity.class to whatever class is the login and register page is
-            Intent i = new Intent(MainActivity.this, LoginActvity.class);
+            Intent i = new Intent(ActivityMain.this, ActivityLogin.class);
             startActivity(i);
             finish();
         }
@@ -95,8 +96,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         textViewUsername = headerView.findViewById(R.id.nav_username);
         textViewEmail = headerView.findViewById(R.id.nav_email);
 
-        textViewUsername.setText(db.getUsername(emailString));
-        textViewEmail.setText(emailString);
+        textViewUsername.setText(db.getUsername(userId));
+        textViewEmail.setText(db.getEmail(userId));
     }
 
     private void setupBtnClickListeners() {
@@ -113,17 +114,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 FAB.onButtonClicked();
-                Intent intent = new Intent(MainActivity.this, EventAddActivity.class);
+                Intent intent = new Intent(ActivityMain.this, ActivityEventAdd.class);
                 intent.putExtra("userId", userId);
                 startActivity(intent);
-                overridePendingTransition(R.anim.from_bottom_anim,0);
+                overridePendingTransition(R.anim.slide_up_anim,0);
             }
         });
         talk_ai.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "TALk to ai clicked", Toast.LENGTH_SHORT).show();
                 FAB.onButtonClicked();
+                Intent intent = new Intent(ActivityMain.this, ActivityAI.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_up_anim,0);
             }
         });
     }
@@ -132,18 +135,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.month_view) {
-            openFragment(new MonthFragment());
+            openFragment(new MonthFragment(userId));
         } else if (itemId == R.id.week_view) {
-            openFragment(new WeekFragment());
+            openFragment(new WeekFragment(userId));
         } else if (itemId == R.id.day_view) {
-            openFragment(new DayFragment());
+            openFragment(new DayFragment(userId));
         } else if (itemId == R.id.about_us) {
-            Intent intent = new Intent(MainActivity.this, AboutUsActivity.class);
+            Intent intent = new Intent(ActivityMain.this, ActivityAboutUs.class);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_left,0);
         } else if (itemId == R.id.logout_btn) {
             sessionManager.removeSession();
-            Intent i = new Intent(MainActivity.this, LoginActvity.class);
+            Intent i = new Intent(ActivityMain.this, ActivityLogin.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
             finish();
