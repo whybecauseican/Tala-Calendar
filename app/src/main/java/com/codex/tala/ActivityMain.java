@@ -2,11 +2,9 @@ package com.codex.tala;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
@@ -22,6 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class ActivityMain extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -33,7 +32,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
     private FloatingActionButton add_btn, add_cal, talk_ai;
     private FABHandler FAB;
     private NavigationView navigationView;
-    private View headerView;
+    private View headerView, dimView;
     private TextView textViewUsername, textViewEmail;
     private int userId;
 
@@ -68,6 +67,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
                 userId = sessionManager.getSession(); //get userId from session if userId is null but isLoggedin which indicates userId is present but not stored
             }
             fragmentManager = getSupportFragmentManager();
+            CalendarUtils.selectedDate = (LocalDate) LocalDate.now();
             openFragment(new MonthFragment(userId));
 
             setNavHeaders();
@@ -80,7 +80,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         super.onStart();
 
         boolean isLoggedin = sessionManager.isLoggedIn();
-        if (isLoggedin == false && userId == -1){ // TODO: 26/02/2024 change loginactivity.class to whatever class is the login and register page is
+        if (!isLoggedin && userId == -1){ // TODO: 26/02/2024 change loginactivity.class to whatever class is the login and register page is
             Intent i = new Intent(ActivityMain.this, ActivityLogin.class);
             startActivity(i);
             finish();
@@ -104,6 +104,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         add_btn = findViewById(R.id.add_btn);
         add_cal = findViewById(R.id.event_shortcut_btn);
         talk_ai = findViewById(R.id.talk_ai_btn);
+        dimView = findViewById(R.id.dimView);
         add_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,6 +130,13 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
                 overridePendingTransition(R.anim.slide_up_anim,0);
             }
         });
+
+        dimView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FAB.onButtonClicked();
+            }
+        });
     }
 
     @Override
@@ -136,11 +144,13 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         if (itemId == R.id.month_view) {
             openFragment(new MonthFragment(userId));
-        } else if (itemId == R.id.week_view) {
-            openFragment(new WeekFragment(userId));
         } else if (itemId == R.id.day_view) {
             openFragment(new DayFragment(userId));
-        } else if (itemId == R.id.about_us) {
+        }
+//        else if (itemId == R.id.schedule_view) {
+//            openFragment(new ScheduleFragment(userId));
+//        }
+        else if (itemId == R.id.about_us) {
             Intent intent = new Intent(ActivityMain.this, ActivityAboutUs.class);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_left,0);

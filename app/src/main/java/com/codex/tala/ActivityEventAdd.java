@@ -25,7 +25,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class ActivityEventAdd extends AppCompatActivity {
-    private EditText eventNameET;
+    private EditText eventNameET, descriptionET;
     private TextView dateStartTv, dateEndTv, timeStartTv, timeEndTv;
     private DatePickerDialog.OnDateSetListener mStartDateSetListener, mEndDateSetListener;
     private DBHelper db;
@@ -56,6 +56,7 @@ public class ActivityEventAdd extends AppCompatActivity {
         dateEndTv = (TextView) findViewById(R.id.dateEndTv);
         timeStartTv = (TextView) findViewById(R.id.timeStartTv);
         timeEndTv = (TextView) findViewById(R.id.timeEndTv);
+        descriptionET = (EditText) findViewById(R.id.descriptionET);
 
         Button cancelBtn = (Button) findViewById(R.id.cancel_btn);
         Button addBtn = (Button) findViewById(R.id.add_btn_event);
@@ -74,17 +75,16 @@ public class ActivityEventAdd extends AppCompatActivity {
                 String eventName = eventNameET.getText().toString();
                 String startTime = timeStartTv.getText().toString();
                 String endTime = timeEndTv.getText().toString();
+                String description = descriptionET.getText().toString();
 
                 LocalTime sT = LocalTime.parse(CalendarUtils.convert12to24(startTime));
                 LocalTime eT = LocalTime.parse(CalendarUtils.convert12to24(endTime));
-                Log.d("Start and End Date and Time",  "Start date|End date: "+ startDateVal + ", " + endDateVal + " Start time|End time " + sT +", "+eT);
                 if (startDateVal.isAfter(endDateVal) || (sT.isAfter(eT) && startDateVal.isEqual(endDateVal))){
                     Toast.makeText(ActivityEventAdd.this, "The event end time cannot be set before the start time.", Toast.LENGTH_SHORT).show();
                     dateEndTv.setTextColor(Color.RED);
                     timeEndTv.setTextColor(Color.RED);
                 }else{
-                    boolean insert = db.insertEventData(userId, eventName, startDateVal.toString(), endDateVal.toString(), startTime, endTime); //runs the inserteventdata function in the dbhelper class
-                    Log.d("debugger insert",  userId + " " + eventName + " " + startDateVal.toString() + " " + endDateVal.toString() + " " + startTime + " " + endTime);
+                    boolean insert = db.insertEventData(userId, eventName, startDateVal.toString(), endDateVal.toString(), startTime, endTime, description); //runs the inserteventdata function in the dbhelper class
                     if (insert) {
                         db.close();
                         finish();
@@ -99,6 +99,7 @@ public class ActivityEventAdd extends AppCompatActivity {
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                db.close();
                 finish();
                 overridePendingTransition(0,R.anim.slide_down_anim);
             }

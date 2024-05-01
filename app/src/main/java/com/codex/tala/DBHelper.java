@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "Tala.db";
@@ -24,6 +25,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_END_DATE = "end_date";
     public static final String COLUMN_START_TIME = "start_time";
     public static final String COLUMN_END_TIME = "end_time";
+    public static final String COLUMN_DESCRIPTION = "description";
 
     public static final String CREATE_TABLE_USERS =
             "CREATE TABLE " + TABLE_USERS + "("
@@ -42,11 +44,12 @@ public class DBHelper extends SQLiteOpenHelper {
                     + COLUMN_END_DATE + " TEXT,"
                     + COLUMN_START_TIME + " TEXT,"
                     + COLUMN_END_TIME + " TEXT,"
+                    + COLUMN_DESCRIPTION + " TEXT,"
                     + "FOREIGN KEY(" + COLUMN_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + ")"
                     + ")";
 
     public DBHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 2);
     }
 
     @Override
@@ -69,10 +72,11 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_USER_NAME, username);
         cv.put(COLUMN_PASSWORD, pass);
         long result = db.insert(TABLE_USERS, null, cv);
+        db.close();
         return result != -1;
     }
 
-    public boolean insertEventData(int userId, String title, String startDate, String endDate, String startTime, String endTime) {
+    public boolean insertEventData(int userId, String title, String startDate, String endDate, String startTime, String endTime, String description) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_USER_ID, userId);
@@ -81,7 +85,9 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_END_DATE, endDate);
         cv.put(COLUMN_START_TIME, startTime);
         cv.put(COLUMN_END_TIME, endTime);
+        cv.put(COLUMN_DESCRIPTION, description);
         long result = db.insert(TABLE_EVENTS, null, cv);
+        db.close();
         return result != -1;
     }
 
@@ -94,6 +100,7 @@ public class DBHelper extends SQLiteOpenHelper {
             userId = cursor.getInt(cursor.getColumnIndexOrThrow("user_id"));
         }
         cursor.close();
+        db.close();
         
         return userId;
     }
@@ -103,6 +110,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE " + COLUMN_EMAIL + " = ?", new String[]{email});
         boolean emailExists = cursor.getCount() > 0;
         cursor.close();
+        db.close();
         return emailExists;
     }
 
@@ -111,23 +119,8 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE " + COLUMN_EMAIL + " = ? AND " + COLUMN_PASSWORD + " = ?", new String[]{email, password});
         boolean emailExists = cursor.getCount() > 0;
         cursor.close();
+        db.close();
         return emailExists;
-    }
-
-    public Cursor getEventDataForDate(int userId, LocalDate date) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String[] projection = {
-                COLUMN_EVENT_TITLE,
-                COLUMN_START_DATE,
-                COLUMN_END_DATE,
-                COLUMN_START_TIME,
-                COLUMN_END_TIME
-        };
-        String selection = COLUMN_USER_ID + " = ? AND " +
-                "? BETWEEN " + COLUMN_START_DATE + " AND " + COLUMN_END_DATE;
-        String formattedDate = date.toString();
-        String[] selectionArgs = {String.valueOf(userId), formattedDate};
-        return db.query(TABLE_EVENTS, projection, selection, selectionArgs, null, null, null);
     }
 
     public String getUsername(int userId) {
@@ -155,6 +148,7 @@ public class DBHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
+            db.close();
         }
 
         return username;
@@ -185,10 +179,66 @@ public class DBHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
+            db.close();
         }
 
         return email;
     }
+
+    public Cursor getEventDataForDate(int userId, LocalDate date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] projection = {
+                COLUMN_EVENT_ID,
+                COLUMN_EVENT_TITLE,
+                COLUMN_START_DATE,
+                COLUMN_END_DATE,
+                COLUMN_START_TIME,
+                COLUMN_END_TIME
+        };
+        String selection = COLUMN_USER_ID + " = ? AND " +
+                "? BETWEEN " + COLUMN_START_DATE + " AND " + COLUMN_END_DATE;
+        String formattedDate = date.toString();
+        String[] selectionArgs = {String.valueOf(userId), formattedDate};
+        return db.query(TABLE_EVENTS, projection, selection, selectionArgs, null, null, null);
+    }
+
+    public Cursor getEventData(int userId, int eventId) {
+        // TODO: add other event datas here for event details section
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] projection = {
+                COLUMN_EVENT_TITLE,
+                COLUMN_START_DATE,
+                COLUMN_END_DATE,
+                COLUMN_START_TIME,
+                COLUMN_END_TIME,
+                COLUMN_DESCRIPTION
+        };
+        String selection = COLUMN_USER_ID + " = ? AND " +
+                COLUMN_EVENT_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(userId), String.valueOf(eventId)};
+        return db.query(TABLE_EVENTS, projection, selection, selectionArgs, null, null, null);
+    }
+
+    public boolean deleteEventData(int userId, int eventId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        boolean isDeleted = false;
+        try {
+            String selection = COLUMN_USER_ID + " = ? AND " + COLUMN_EVENT_ID + " = ?";
+            String[] selectionArgs = {String.valueOf(userId), String.valueOf(eventId)};
+
+            int rowsDeleted = db.delete(TABLE_EVENTS, selection, selectionArgs);
+
+            if (rowsDeleted > 0) {
+                isDeleted = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+        return isDeleted;
+    }
+
 
     public boolean checkCalendarEventExists(int userId, LocalDate date) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -202,17 +252,12 @@ public class DBHelper extends SQLiteOpenHelper {
         String[] projection = {COLUMN_EVENT_ID};
         String selection = COLUMN_USER_ID + " = ? AND (? BETWEEN " + COLUMN_START_DATE + " AND " + COLUMN_END_DATE + ")";
         String[] selectionArgs = {String.valueOf(userId), dateString};
-        Cursor cursor = null;
-        try {
-            cursor = db.query(TABLE_EVENTS, projection, selection, selectionArgs, null, null, null);
+        try (Cursor cursor = db.query(TABLE_EVENTS, projection, selection, selectionArgs, null, null, null)) {
             eventExists = cursor != null && cursor.getCount() > 0;
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
+        db.close();
 
         return eventExists;
     }

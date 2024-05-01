@@ -11,17 +11,28 @@
         android:layout_height="50dp"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/cancel_btn"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/lin_back_btn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp"
-            android:text="Cancel"
-            android:textColor="@color/color_main_darkcyan"
-            android:textSize="18sp"
-            android:background="@android:color/transparent"
-            style="@style/FirstLetterCapitalizedButton"/>
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_height="25dp"
+                android:layout_width="25dp"
+                android:background="@drawable/baseline_arrow_back_ios_new_24"
+                android:backgroundTint="@color/color_main_darkcyan"/>
+
+            <TextView
+                android:id="@+id/ed_month_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Month"
+                android:textColor="@color/color_main_darkcyan"
+                android:textSize="17sp"/>
+        </LinearLayout>
+
 
         <View
             android:layout_width="0dp"
@@ -32,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:text="New Event"
+            android:text="Event Details"
             android:textSize="18sp"
             android:textColor="@color/black"
             android:textStyle="bold"
@@ -44,11 +55,11 @@
             android:layout_weight="1"/>
 
         <Button
-            android:id="@+id/add_btn_event"
+            android:id="@+id/edit_event_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Add"
+            android:text="Edit"
             android:textColor="@color/color_main_darkcyan"
             android:textSize="18sp"
             android:background="@android:color/transparent"
@@ -56,15 +67,15 @@
 
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/eventNameET"
+    <TextView
+        android:id="@+id/ED_event_name"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="60dp"
         android:layout_marginEnd="30dp"
-        android:background="@android:color/transparent"
-        android:hint="Add title"
-        android:inputType="text"
+        android:gravity="center_vertical"
+        android:text="Title"
+        android:textColor="@color/black"
         android:textSize="20sp"/>
 
     <View
@@ -91,19 +102,13 @@
                 android:src="@drawable/baseline_access_time_24"/>
 
             <TextView
+                android:id="@+id/ED_allday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="All-day"
+                android:text="Scheduled Event"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
-
-            <Switch
-                android:id="@+id/btn_allDay"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="15sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -113,7 +118,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/dateStartTv"
+                android:id="@+id/ED_dateStartTv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -124,7 +129,7 @@
                 android:layout_marginStart="60dp"/>
 
             <TextView
-                android:id="@+id/timeStartTv"
+                android:id="@+id/ED_timeStartTv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -142,28 +147,28 @@
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/dateEndTv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="85dp"
-                    android:text="Monday, Mar 4"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:layout_marginStart="60dp" />
+            <TextView
+                android:id="@+id/ED_dateEndTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="85dp"
+                android:text="Monday, Mar 4"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:layout_marginStart="60dp" />
 
-                <TextView
-                    android:id="@+id/timeEndTv"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:layout_weight="1"
-                    android:textAlignment="textEnd"
-                    android:layout_marginEnd="15sp"
-                    android:text="3:45 AM"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/ED_timeEndTv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:textAlignment="textEnd"
+                android:layout_marginEnd="15sp"
+                android:text="3:45 AM"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -187,26 +192,6 @@
                 android:text="Does not repeat"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:orientation="vertical">
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:src="@drawable/baseline_keyboard_arrow_up_24"
-                    android:scaleX="1.5"
-                    android:scaleY="1.5"/>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:src="@drawable/baseline_keyboard_arrow_down_24"
-                    android:scaleX="1.5"
-                    android:scaleY="1.5"/>
-            </LinearLayout>
-
         </LinearLayout>
     </LinearLayout>
 
@@ -239,27 +224,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginTop="3dp"
-                android:text="Add a notification"
+                android:text="No notification set"
+                android:textColor="@color/black"
                 android:textSize="18sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:orientation="vertical">
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:src="@drawable/baseline_keyboard_arrow_up_24"
-                    android:scaleX="1.5"
-                    android:scaleY="1.5"/>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:src="@drawable/baseline_keyboard_arrow_down_24"
-                    android:scaleX="1.5"
-                    android:scaleY="1.5"/>
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
@@ -295,25 +262,6 @@
                 android:text="Default color"
                 android:textSize="18sp"
                 android:textColor="@color/black"/>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:orientation="vertical">
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:src="@drawable/baseline_keyboard_arrow_up_24"
-                    android:scaleX="1.5"
-                    android:scaleY="1.5"/>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="15dp"
-                    android:src="@drawable/baseline_keyboard_arrow_down_24"
-                    android:scaleX="1.5"
-                    android:scaleY="1.5"/>
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
@@ -323,6 +271,7 @@
         android:background="@android:color/darker_gray"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -333,20 +282,39 @@
             android:layout_gravity="center"
             android:src="@drawable/baseline_description_24"/>
 
-        <EditText
-            android:id="@+id/descriptionET"
+        <TextView
+            android:id="@+id/descriptionTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="15sp"
             android:background="@android:color/transparent"
-            android:hint="Add description"
-            android:inputType="textLongMessage"
+            android:text="Description"
+            android:textColor="@color/black"
             android:textSize="18sp"/>
     </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"/>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/delete_event_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:background="@android:color/transparent"
+        android:text="Delete Event"
+        android:textColor="@color/color_main_darkcyan"
+        android:textSize="18sp"
+        style="@style/FirstLetterCapitalizedButton"/>
 
 </LinearLayout>

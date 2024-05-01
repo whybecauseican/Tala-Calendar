@@ -99,7 +99,6 @@ public class ActivityLogin extends AppCompatActivity {
                 SessionManager sessionManager = new SessionManager(ActivityLogin.this);
                 sessionManager.saveSession(userid);
             }
-            Log.d("USERID IN LOGIN", String.valueOf(userid));
             Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
             intent.putExtra("userId", userid);
             startActivity(intent);

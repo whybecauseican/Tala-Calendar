@@ -37,6 +37,10 @@
             android:exported="true">
         </activity>
         <activity
+            android:name=".ActivityEventDetails"
+            android:exported="true">
+        </activity>
+        <activity
             android:name=".ActivityAI"
             android:exported="true">
         </activity>

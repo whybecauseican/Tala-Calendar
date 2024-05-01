@@ -12,6 +12,7 @@ public class FABHandler { //floating action button handler
     private Animation rotateOpen, rotateClose, fromBottom, toBottom;
     private TextView text_cal, text_ai;
     private FloatingActionButton add_cal, talk_ai, add_btn;
+    private View dimView;
 
     private boolean clicked = false;
 
@@ -25,6 +26,7 @@ public class FABHandler { //floating action button handler
         add_btn = activity.findViewById(R.id.add_btn);
         add_cal = activity.findViewById(R.id.event_shortcut_btn);
         talk_ai = activity.findViewById(R.id.talk_ai_btn);
+        dimView = activity.findViewById(R.id.dimView);
     }
 
     public void onButtonClicked() {
@@ -40,6 +42,7 @@ public class FABHandler { //floating action button handler
         text_cal.setVisibility(visibility);
         talk_ai.setVisibility(visibility);
         text_ai.setVisibility(visibility);
+        dimView.setVisibility(visibility);
     }
 
     private void setAnimation(boolean clicked) {
@@ -61,5 +64,6 @@ public class FABHandler { //floating action button handler
     private void setClickable(boolean clicked) {
         talk_ai.setClickable(!clicked);
         add_cal.setClickable(!clicked);
+        dimView.setClickable(!clicked);
     }
 }

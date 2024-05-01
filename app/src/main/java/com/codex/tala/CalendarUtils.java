@@ -1,34 +1,66 @@
 package com.codex.tala;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 public class CalendarUtils {
     public static LocalDate selectedDate;
+
+    public static String formattedShortTime(LocalTime time){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return time.format(formatter);
+    }
 
     public static String monthYearFromDate(LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
         return date.format(formatter);
     }
 
-    public static ArrayList<LocalDate> daysInMonthArray(LocalDate date) {
-        ArrayList<LocalDate> daysInMonthArray = new ArrayList<>();
-        YearMonth yearMonth = YearMonth.from(date);
+    public static String monthDayFromDate(LocalDate date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d");
+        return date.format(formatter);
+    }
 
+    public static String monthFromDate(String dateString) {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat outputFormat = new SimpleDateFormat("MMMM", Locale.getDefault());
+        try {
+            Date date = inputFormat.parse(dateString);
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return dateString; // Return original string in case of parsing error
+        }
+    }
+
+    public static ArrayList<LocalDate> daysInMonthArray() {
+        ArrayList<LocalDate> daysInMonthArray = new ArrayList<>();
+
+        YearMonth yearMonth = YearMonth.from(selectedDate);
         int daysInMonth = yearMonth.lengthOfMonth();
-        LocalDate firstOfMonth = date.withDayOfMonth(1);
+
+        LocalDate prevMonth = selectedDate.minusMonths(1);
+        LocalDate nextMonth = selectedDate.plusMonths(1);
+
+        YearMonth prevYearMonth = YearMonth.from(prevMonth);
+        int prevDaysInMonth = prevYearMonth.lengthOfMonth();
+
+        LocalDate firstOfMonth = selectedDate.withDayOfMonth(1);
         int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
 
-        int numRows = (int) Math.ceil((dayOfWeek + daysInMonth) / 7.0);
-        int totalDays = numRows * 7;
-
-        for (int i = 1; i <= totalDays; i++) {
-            if (i <= dayOfWeek || i > daysInMonth + dayOfWeek)
-                daysInMonthArray.add(null);
+        for (int i = 1; i <= 42; i++) {
+            if (i <= dayOfWeek)
+                daysInMonthArray.add(LocalDate.of(prevMonth.getYear(), prevMonth.getMonth(), prevDaysInMonth + i - dayOfWeek));
+            else if (i > daysInMonth + dayOfWeek)
+                daysInMonthArray.add(LocalDate.of(nextMonth.getYear(), nextMonth.getMonth(), i - dayOfWeek - daysInMonth));
             else
                 daysInMonthArray.add(LocalDate.of(selectedDate.getYear(), selectedDate.getMonth(), i - dayOfWeek));
 
@@ -39,7 +71,6 @@ public class CalendarUtils {
 
     public static ArrayList<LocalDate> daysInWeekArray(LocalDate selectedDate) {
         ArrayList<LocalDate> days = new ArrayList<>();
-
         LocalDate current = sundayForDate(selectedDate);
         LocalDate endDate = current.plusWeeks(1);
 
@@ -75,5 +106,17 @@ public class CalendarUtils {
         }
 
         return String.format(Locale.ENGLISH,"%02d:%02d", hour, minute);
+    }
+
+    public static String convertDateFormat(String dateString) {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat outputFormat = new SimpleDateFormat("EEEE, MMM d", Locale.getDefault());
+        try {
+            Date date = inputFormat.parse(dateString);
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return dateString; // Return original string in case of parsing error
+        }
     }
 }

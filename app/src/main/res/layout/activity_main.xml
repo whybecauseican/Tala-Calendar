@@ -32,6 +32,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/dimView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:clickable="true"
+        android:visibility="invisible"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
         <include
             android:id="@+id/fab_layout"
             layout="@layout/fab_layout"
@@ -39,7 +53,6 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -52,5 +65,4 @@
         app:itemTextColor="@color/color_main_darkcyan"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_menu"/>
-
 </androidx.drawerlayout.widget.DrawerLayout>

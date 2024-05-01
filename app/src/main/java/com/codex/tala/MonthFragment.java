@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MonthFragment extends Fragment implements CalendarAdapter.OnItemListener{
 
@@ -30,7 +32,7 @@ public class MonthFragment extends Fragment implements CalendarAdapter.OnItemLis
     private RecyclerView calendarRecyclerView;
     private ListView eventListView;
     private DBHelper db;
-    private int userId;
+    private final int userId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,7 +40,6 @@ public class MonthFragment extends Fragment implements CalendarAdapter.OnItemLis
         View view = inflater.inflate(R.layout.fragment_month, container, false);
         initWidgets(view);
         setBtn(view);
-        CalendarUtils.selectedDate = (LocalDate) LocalDate.now();
         setMonthView();
 
         return view;
@@ -57,7 +58,7 @@ public class MonthFragment extends Fragment implements CalendarAdapter.OnItemLis
 
     private void setMonthView() {
         monthYearText.setText(monthYearFromDate(CalendarUtils.selectedDate));
-        ArrayList<LocalDate> daysInMonth = daysInMonthArray(CalendarUtils.selectedDate);
+        ArrayList<LocalDate> daysInMonth = daysInMonthArray();
         CalendarAdapter calendarAdapter = new CalendarAdapter(getContext(), userId, daysInMonth, this);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 7);
         calendarRecyclerView.setAdapter(calendarAdapter);
@@ -106,13 +107,14 @@ public class MonthFragment extends Fragment implements CalendarAdapter.OnItemLis
     @Override
     public void onResume() {
         super.onResume();
-        setEventAdapter();
+        setMonthView();
     }
 
     private void setEventAdapter() {
         db = new DBHelper(getContext());
         ArrayList<Event> dailyEvents = Event.eventsForDate(db,userId,CalendarUtils.selectedDate); //all events that occured on the selectedDate
-        EventAdapter eventAdapter = new EventAdapter(getContext().getApplicationContext(), dailyEvents); //function to populate the listview with the events
+        EventAdapter eventAdapter = new EventAdapter(requireContext().getApplicationContext(), dailyEvents); //function to populate the listview with the events
+        db.close();
         eventListView.setAdapter(eventAdapter);
     }
 }

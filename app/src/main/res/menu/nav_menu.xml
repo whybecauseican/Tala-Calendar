@@ -13,14 +13,14 @@
             android:title="Month"/>
 
         <item
-            android:id="@+id/week_view"
-            android:icon="@drawable/baseline_calendar_view_week_24"
-            android:title="Week"/>
-
-        <item
             android:id="@+id/day_view"
             android:icon="@drawable/baseline_calendar_view_day_24"
             android:title="Day"/>
+
+<!--        <item-->
+<!--            android:id="@+id/schedule_view"-->
+<!--            android:icon="@drawable/baseline_calendar_view_day_24"-->
+<!--            android:title="Schedule"/>-->
     </group>
     <group
         android:id="@+id/group2">

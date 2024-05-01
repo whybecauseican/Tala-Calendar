@@ -68,7 +68,7 @@
         android:textAllCaps="true"
         android:textColor="@color/black"
         android:textSize="14sp"
-        android:text="March 3, 2024" />
+        android:text="Upcoming Events" />
 
     <ListView
         android:id="@+id/eventListView"
