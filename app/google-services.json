@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "921773051154",
+    "firebase_url": "https://my-first-project-63f16-default-rtdb.firebaseio.com",
+    "project_id": "my-first-project-63f16",
+    "storage_bucket": "my-first-project-63f16.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:921773051154:android:ee6c4e432f6fac366cf7cb",
+        "android_client_info": {
+          "package_name": "com.codex.tala"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmy40Phe4TOLng_LMC6R-9ERW2BbWzCKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
