@@ -16,12 +16,17 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 public class ActivityEventAdd extends AppCompatActivity {
@@ -31,6 +36,9 @@ public class ActivityEventAdd extends AppCompatActivity {
     private DBHelper db;
     private int year, month, day, userId;
     private LocalDate startDateVal, endDateVal;
+
+    FirebaseDatabase rootNode;
+    DatabaseReference reference;
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
@@ -69,6 +77,9 @@ public class ActivityEventAdd extends AppCompatActivity {
         startTime();
         endTime();
 
+        rootNode = FirebaseDatabase.getInstance();
+        reference = rootNode.getReference("users");
+
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,6 +87,16 @@ public class ActivityEventAdd extends AppCompatActivity {
                 String startTime = timeStartTv.getText().toString();
                 String endTime = timeEndTv.getText().toString();
                 String description = descriptionET.getText().toString();
+
+                Map<String, Object> userData = new HashMap<>();
+                userData.put("description",description);
+                userData.put("eventName",eventName);
+                userData.put("startTime",startTime);
+                userData.put("endTime",endTime);
+
+                reference.child(startTime).setValue(eventName);
+
+
 
                 LocalTime sT = LocalTime.parse(CalendarUtils.convert12to24(startTime));
                 LocalTime eT = LocalTime.parse(CalendarUtils.convert12to24(endTime));

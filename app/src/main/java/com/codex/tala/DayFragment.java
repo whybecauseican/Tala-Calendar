@@ -122,7 +122,6 @@ public class DayFragment extends Fragment implements CalendarAdapter.OnItemListe
     }
 
     private void setAllDayEvents() {
-
         TextView event1= view.findViewById(R.id.allday_event1);
         TextView event2= view.findViewById(R.id.allday_event2);
         TextView event3= view.findViewById(R.id.allday_event3);
@@ -132,7 +131,7 @@ public class DayFragment extends Fragment implements CalendarAdapter.OnItemListe
         ArrayList<Event> events = Event.eventsForDate(db,userId,selectedDate);
         db.close();
         for (Event event: events){
-            if (!String.valueOf(selectedDate).equals(event.getEndDate()) || !String.valueOf(selectedDate).equals(event.getStartDate())){
+            if (!String.valueOf(selectedDate).equals(event.getEndDate()) && !String.valueOf(selectedDate).equals(event.getStartDate())){
                 allDayEvents.add(event);
             }
         }

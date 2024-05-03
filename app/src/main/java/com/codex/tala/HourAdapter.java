@@ -51,27 +51,34 @@ public class HourAdapter extends ArrayAdapter<HourEvent> {
         TextView event2= convertView.findViewById(R.id.event2);
         TextView event3= convertView.findViewById(R.id.event3);
 
-        if(events.size() == 0){
+        ArrayList<Event> scheduledEvents = new ArrayList<>();
+        for (Event event: events){
+            if (String.valueOf(selectedDate).equals(event.getEndDate()) || String.valueOf(selectedDate).equals(event.getStartDate())){
+                scheduledEvents.add(event);
+            }
+        }
+
+        if(scheduledEvents.size() == 0){
             hideEvent(event1);
             hideEvent(event2);
             hideEvent(event3);
-        } else if(events.size() == 1){
-            setEvent(event1, events.get(0));
+        } else if(scheduledEvents.size() == 1){
+            setEvent(event1, scheduledEvents.get(0));
             hideEvent(event2);
             hideEvent(event3);
-        } else if(events.size() == 2){
-            setEvent(event1, events.get(0));
-            setEvent(event2, events.get(1));
+        } else if(scheduledEvents.size() == 2){
+            setEvent(event1, scheduledEvents.get(0));
+            setEvent(event2, scheduledEvents.get(1));
             hideEvent(event3);
-        } else if(events.size() == 3){
-            setEvent(event1, events.get(0));
-            setEvent(event2, events.get(1));
-            setEvent(event3, events.get(2));
+        } else if(scheduledEvents.size() == 3){
+            setEvent(event1, scheduledEvents.get(0));
+            setEvent(event2, scheduledEvents.get(1));
+            setEvent(event3, scheduledEvents.get(2));
         } else {
-            setEvent(event1, events.get(0));
-            setEvent(event2, events.get(1));
+            setEvent(event1, scheduledEvents.get(0));
+            setEvent(event2, scheduledEvents.get(1));
             event3.setVisibility(View.VISIBLE);
-            String eventsNotShown = String.valueOf(events.size() - 2);
+            String eventsNotShown = String.valueOf(scheduledEvents.size() - 2);
             eventsNotShown += " More Event/s";
             event3.setText(eventsNotShown);
         }

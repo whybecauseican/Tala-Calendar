@@ -10,6 +10,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActivitySignUp extends AppCompatActivity {
 
@@ -17,6 +22,9 @@ public class ActivitySignUp extends AppCompatActivity {
     private TextView signin_btn;
     private Button createAccountButton;
     private DBHelper db;
+
+    FirebaseDatabase rootNode;
+    DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +48,22 @@ public class ActivitySignUp extends AppCompatActivity {
         createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                rootNode = FirebaseDatabase.getInstance();
+                reference = rootNode.getReference("users");
+
+
                 if (validateInputs()) {
                     String email = emailInput.getText().toString();
                     String username = usernameInput.getText().toString();
                     String password = pwdInput.getText().toString();
+
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("email", email);
+                    userData.put("username", username);
+                    userData.put("password", password);
+
+                    reference.child(username).setValue(userData);
 
                     Boolean checkemail = db.checkemail(email); //runs the checkemail function in the dbhelper class
                     if (checkemail == false) {
