@@ -93,6 +93,8 @@ public class ActivityEventAdd extends AppCompatActivity {
                 userData.put("eventName",eventName);
                 userData.put("startTime",startTime);
                 userData.put("endTime",endTime);
+                // gumagana na po sya
+
 
                 reference.child(startTime).setValue(eventName);
 
