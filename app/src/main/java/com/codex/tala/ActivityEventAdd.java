@@ -78,7 +78,10 @@ public class ActivityEventAdd extends AppCompatActivity {
         endTime();
 
         rootNode = FirebaseDatabase.getInstance();
-        reference = rootNode.getReference("users");
+        reference = rootNode.getReference("event");
+
+
+
 
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,15 +91,16 @@ public class ActivityEventAdd extends AppCompatActivity {
                 String endTime = timeEndTv.getText().toString();
                 String description = descriptionET.getText().toString();
 
-                Map<String, Object> userData = new HashMap<>();
-                userData.put("description",description);
-                userData.put("eventName",eventName);
-                userData.put("startTime",startTime);
-                userData.put("endTime",endTime);
-                // gumagana na po sya
+                Map<String, Object> eventData = new HashMap<>();
+                eventData.put("description", description);
+                eventData.put("eventName", eventName);
+                eventData.put("startTime", startTime);
+                eventData.put("endTime", endTime);
+                eventData.put("startDate", startDateVal.toString());
+                eventData.put("endDate", endDateVal.toString());
 
+                reference.child(eventName).setValue(eventData);
 
-                reference.child(startTime).setValue(eventName);
 
 
 

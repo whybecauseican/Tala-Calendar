@@ -14,12 +14,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 public class ActivityEventDetails extends AppCompatActivity {
     private TextView title, description, startDate, endDate, startTime, endTime, monthTv;
     private DBHelper db;
     private LinearLayout linearLayout;
     private Button edit_event_btn, delete_event_btn;
     private int userid, eventid;
+
+
     AlertDialog.Builder builder;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,8 @@ public class ActivityEventDetails extends AppCompatActivity {
         endDate = (TextView) findViewById(R.id.ED_dateEndTv);
         startTime = (TextView) findViewById(R.id.ED_timeStartTv);
         endTime = (TextView) findViewById(R.id.ED_timeEndTv);
+
+
 
         db = new DBHelper(this);
         setEventDetails();

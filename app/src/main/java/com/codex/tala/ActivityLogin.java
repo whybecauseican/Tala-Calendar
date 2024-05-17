@@ -1,10 +1,10 @@
 package com.codex.tala;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -13,6 +13,11 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class ActivityLogin extends AppCompatActivity {
     private EditText mail, pass;
@@ -23,6 +28,8 @@ public class ActivityLogin extends AppCompatActivity {
 
     private DBHelper db;
     private Boolean rememberCond;
+
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +42,15 @@ public class ActivityLogin extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
 
-        mail = (EditText) findViewById(R.id.email_editText);
-        pass = (EditText) findViewById(R.id.password_editText);
-        forgotPass = (TextView) findViewById(R.id.forgotPasswordTextView);
-        signUp = (TextView) findViewById(R.id.signUp);
-        rememberMe = (Switch) findViewById(R.id.rememberSwitch);
-        loginBtn = (Button) findViewById(R.id.login_Btn);
-        googleSignInBtn = (ImageView) findViewById(R.id.google_Btn);
+        mail = findViewById(R.id.email_editText);
+        pass = findViewById(R.id.password_editText);
+        forgotPass = findViewById(R.id.forgotPasswordTextView);
+        signUp = findViewById(R.id.signUp);
+        rememberMe = findViewById(R.id.rememberSwitch);
+        loginBtn = findViewById(R.id.login_Btn);
+        googleSignInBtn = findViewById(R.id.google_Btn);
+        mAuth = FirebaseAuth.getInstance();
+
         db = new DBHelper(this);
 
         rememberCond = false;
@@ -56,14 +65,29 @@ public class ActivityLogin extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                login();
+                String email = mail.getText().toString().trim();
+                String password = pass.getText().toString().trim();
+
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(ActivityLogin.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+
+                                    login();
+                                } else {
+                                    // If sign in fails, display a message to the user.
+                                    Toast.makeText(ActivityLogin.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
             }
         });
 
         forgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // Handle forgot password functionality here
             }
         });
 
@@ -78,7 +102,7 @@ public class ActivityLogin extends AppCompatActivity {
         googleSignInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // Handle Google Sign-In functionality here
             }
         });
     }
@@ -94,7 +118,7 @@ public class ActivityLogin extends AppCompatActivity {
 
         boolean isValidCredentials = db.checkemailpass(email, pwd);
         if (isValidCredentials) {
-            int userid = db.getUserId(email,pwd);
+            int userid = db.getUserId(email, pwd);
             if (rememberCond) {
                 SessionManager sessionManager = new SessionManager(ActivityLogin.this);
                 sessionManager.saveSession(userid);
@@ -107,5 +131,4 @@ public class ActivityLogin extends AppCompatActivity {
             Toast.makeText(ActivityLogin.this, "Invalid email and/or password", Toast.LENGTH_SHORT).show();
         }
     }
-
 }
