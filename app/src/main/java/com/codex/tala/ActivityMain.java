@@ -80,7 +80,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         super.onStart();
 
         boolean isLoggedin = sessionManager.isLoggedIn();
-        if (!isLoggedin && userId == -1){ // TODO: 26/02/2024 change loginactivity.class to whatever class is the login and register page is
+        if (!isLoggedin && userId == -1) {
             Intent i = new Intent(ActivityMain.this, ActivityLogin.class);
             startActivity(i);
             finish();

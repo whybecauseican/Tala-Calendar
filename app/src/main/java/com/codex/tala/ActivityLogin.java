@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -18,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ActivityLogin extends AppCompatActivity {
     private EditText mail, pass;
@@ -73,16 +75,32 @@ public class ActivityLogin extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-
-                                    login();
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    if (user != null) {
+                                        int userid = db.getUserId(email, password);
+                                        Log.d("LoginActivity", "User authentication successful. UserId: " + userid);
+                                        login();
+                                        if (rememberCond) {
+                                            SessionManager sessionManager = new SessionManager(ActivityLogin.this);
+                                            sessionManager.saveSession(userid);
+                                        }
+                                        Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
+                                        intent.putExtra("userId", userid);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        Log.d("LoginActivity", "Current user is null");
+                                        Toast.makeText(ActivityLogin.this, "User is null", Toast.LENGTH_SHORT).show();
+                                    }
                                 } else {
-                                    // If sign in fails, display a message to the user.
-                                    Toast.makeText(ActivityLogin.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                    Log.d("LoginActivity", "Authentication failed: " + task.getException().getMessage());
+                                    Toast.makeText(ActivityLogin.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
             }
         });
+
 
         forgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,8 +134,8 @@ public class ActivityLogin extends AppCompatActivity {
             return;
         }
 
-        boolean isValidCredentials = db.checkemailpass(email, pwd);
-        if (isValidCredentials) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
             int userid = db.getUserId(email, pwd);
             if (rememberCond) {
                 SessionManager sessionManager = new SessionManager(ActivityLogin.this);
@@ -128,7 +146,7 @@ public class ActivityLogin extends AppCompatActivity {
             startActivity(intent);
             finish();
         } else {
-            Toast.makeText(ActivityLogin.this, "Invalid email and/or password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivityLogin.this, "User is null", Toast.LENGTH_SHORT).show();
         }
     }
 }

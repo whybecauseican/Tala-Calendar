@@ -61,66 +61,66 @@ public class ActivitySignUp extends AppCompatActivity {
         createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 rootNode = FirebaseDatabase.getInstance();
                 reference = rootNode.getReference("users");
                 mAuth = FirebaseAuth.getInstance();
-
 
                 if (validateInputs()) {
                     String email = emailInput.getText().toString();
                     String username = usernameInput.getText().toString();
                     String password = pwdInput.getText().toString();
 
-                    Map<String, Object> userData = new HashMap<>();
-                    userData.put("email", email);
-                    userData.put("username", username);
-                    userData.put("password", password);
+                    Boolean checkemail = db.checkemail(email); // runs the checkemail function in the dbhelper class
+                    if (!checkemail) {
+                        mAuth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(ActivitySignUp.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            FirebaseUser user = mAuth.getCurrentUser();
+                                            if (user != null) {
+                                                user.sendEmailVerification()
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Log.d(TAG, "Email verification sent.");
+                                                                    Toast.makeText(ActivitySignUp.this, "Verification email sent. Please check your email.", Toast.LENGTH_SHORT).show();
 
-                    reference.child(username).setValue(userData);
+                                                                    // Save user data temporarily until they verify their email
+                                                                    Map<String, Object> userData = new HashMap<>();
+                                                                    userData.put("email", email);
+                                                                    userData.put("username", username);
+                                                                    userData.put("password", password);
 
-                    Boolean checkemail = db.checkemail(email); //runs the checkemail function in the dbhelper class
-                    if (checkemail == false) {
-                        Boolean insert = db.insertUsersData(email, username, password); //runs the insertdata function in the dbhelper class
-                        if (insert == true) {
-                            finish();
-                        } else {
-                            Toast.makeText(ActivitySignUp.this, "Something went wrong. Please try again later", Toast.LENGTH_SHORT).show();
-                        }
+
+                                                                    reference = rootNode.getReference("users").child(username);
+
+
+                                                                    mAuth.signOut();
+                                                                    Intent intent = new Intent(ActivitySignUp.this, ActivityLogin.class);
+                                                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                                    startActivity(intent);
+                                                                } else {
+                                                                    Toast.makeText(ActivitySignUp.this, "Failed to send verification email.", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            }
+                                                        });
+                                            } else {
+                                                Toast.makeText(ActivitySignUp.this, "User is null.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(ActivitySignUp.this, "Failed to create user: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
                     } else {
-                        Toast.makeText(ActivitySignUp.this, "Email already exist! Please enter a different email", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ActivitySignUp.this, "Email already exists! Please enter a different email", Toast.LENGTH_SHORT).show();
                     }
-
-//                    mAuth.createUserWithEmailAndPassword(email, password)
-//                        .addOnCompleteListener(ActivitySignUp.this, new OnCompleteListener<AuthResult>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<AuthResult> task) {
-//                                if (task.isSuccessful()) {
-//                                    // Sign in success, update UI with the signed-in user's information
-//                                    FirebaseUser user = mAuth.getCurrentUser();
-//                                    if (user != null) {
-//                                        user.sendEmailVerification()
-//                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                                    @Override
-//                                                    public void onComplete(@NonNull Task<Void> task) {
-//                                                        if (task.isSuccessful()) {
-//                                                            Log.d(TAG, "Email verification sent.");
-//                                                        }
-//                                                    }
-//                                                });
-//                                    }
-//                                    Toast.makeText(ActivitySignUp.this, "Account created.",
-//                                            Toast.LENGTH_SHORT).show();
-//                                } else {
-//                                    // If sign in fails, display a message to the user.
-//                                    Toast.makeText(ActivitySignUp.this, "Authentication failed.",
-//                                            Toast.LENGTH_SHORT).show();
-//                                }
-//                            }
-//                        });
                 }
             }
         });
+
 
         signin_btn.setOnClickListener(new View.OnClickListener() {
             @Override
