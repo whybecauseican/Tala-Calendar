@@ -64,6 +64,7 @@ public class ActivityLogin extends AppCompatActivity {
             }
         });
 
+        // feeling ko andito lang yung prob kaya ayaw mag sign and hindi ko lang makita
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,6 +101,8 @@ public class ActivityLogin extends AppCompatActivity {
                         });
             }
         });
+
+
 
 
         forgotPass.setOnClickListener(new View.OnClickListener() {
