@@ -101,7 +101,7 @@ public class ActivityLogin extends AppCompatActivity {
             }
         });
 
-//testingg
+
         forgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
