@@ -70,7 +70,7 @@ public class ActivitySignUp extends AppCompatActivity {
                     String username = usernameInput.getText().toString();
                     String password = pwdInput.getText().toString();
 
-                    Boolean checkemail = db.checkemail(email); // runs the checkemail function in the dbhelper class
+                    Boolean checkemail = db.checkemail(email);
                     if (!checkemail) {
                         mAuth.createUserWithEmailAndPassword(email, password)
                                 .addOnCompleteListener(ActivitySignUp.this, new OnCompleteListener<AuthResult>() {
@@ -93,9 +93,7 @@ public class ActivitySignUp extends AppCompatActivity {
                                                                     userData.put("username", username);
                                                                     userData.put("password", password);
 
-
-                                                                    reference = rootNode.getReference("users").child(username);
-
+                                                                    reference.child(username).setValue(userData);
 
                                                                     mAuth.signOut();
                                                                     Intent intent = new Intent(ActivitySignUp.this, ActivityLogin.class);

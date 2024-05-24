@@ -80,11 +80,11 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         super.onStart();
 
         boolean isLoggedin = sessionManager.isLoggedIn();
-        if (!isLoggedin && userId == -1) {
-            Intent i = new Intent(ActivityMain.this, ActivityLogin.class);
-            startActivity(i);
-            finish();
-        }
+//        if (!isLoggedin && userId == -1) {
+//            Intent i = new Intent(ActivityMain.this, ActivityLogin.class);
+//            startActivity(i);
+//            finish();
+//        }
     }
 
     private void setNavHeaders() {

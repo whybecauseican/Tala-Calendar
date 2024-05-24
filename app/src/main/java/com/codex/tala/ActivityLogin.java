@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +32,7 @@ public class ActivityLogin extends AppCompatActivity {
     private DBHelper db;
     private Boolean rememberCond;
 
-    FirebaseAuth mAuth;
+   private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,11 @@ public class ActivityLogin extends AppCompatActivity {
                 String email = mail.getText().toString().trim();
                 String password = pass.getText().toString().trim();
 
+                if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+                    Toast.makeText(ActivityLogin.this, "Email and password must not be empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(ActivityLogin.this, new OnCompleteListener<AuthResult>() {
                             @Override
@@ -78,17 +84,27 @@ public class ActivityLogin extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     if (user != null) {
-                                        int userid = db.getUserId(email, password);
-                                        Log.d("LoginActivity", "User authentication successful. UserId: " + userid);
-                                        login();
-                                        if (rememberCond) {
-                                            SessionManager sessionManager = new SessionManager(ActivityLogin.this);
-                                            sessionManager.saveSession(userid);
+                                        if (user.isEmailVerified()) {
+                                            int userid = db.getUserId(email, password);
+                                            if (userid == -1) {
+                                                // User does not exist in local DB, create an entry
+                                                db.insertUsersData(email, user.getDisplayName(), password);
+                                                userid = db.getUserId(email, password);
+                                            }
+                                            Log.d("LoginActivity", "User authentication successful. UserId: " + userid);
+                                            login();
+                                            if (rememberCond) {
+                                                SessionManager sessionManager = new SessionManager(ActivityLogin.this);
+                                                sessionManager.saveSession(userid);
+                                            }
+                                            Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
+                                            intent.putExtra("userId", userid);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            Log.d("LoginActivity", "Email not verified");
+                                            Toast.makeText(ActivityLogin.this, "Please verify your email first", Toast.LENGTH_SHORT).show();
                                         }
-                                        Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
-                                        intent.putExtra("userId", userid);
-                                        startActivity(intent);
-                                        finish();
                                     } else {
                                         Log.d("LoginActivity", "Current user is null");
                                         Toast.makeText(ActivityLogin.this, "User is null", Toast.LENGTH_SHORT).show();
@@ -101,6 +117,7 @@ public class ActivityLogin extends AppCompatActivity {
                         });
             }
         });
+
 
 
 
@@ -127,6 +144,8 @@ public class ActivityLogin extends AppCompatActivity {
             }
         });
     }
+
+
 
     private void login() {
         String email = mail.getText().toString().trim();
