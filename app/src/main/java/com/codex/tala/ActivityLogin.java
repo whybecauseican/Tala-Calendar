@@ -65,6 +65,16 @@ public class ActivityLogin extends AppCompatActivity {
             }
         });
 
+        // Retrieve saved credentials if exist
+        String[] savedCredentials = db.getUserCredentials();
+        if (savedCredentials[0] != null && savedCredentials[1] != null) {
+            mail.setText(savedCredentials[0]);
+            pass.setText(savedCredentials[1]);
+            rememberMe.setChecked(true);
+        }else{
+            db.clearUserCredentials();
+        }
+
         // feeling ko andito lang yung prob kaya ayaw mag sign and hindi ko lang makita
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,8 +104,11 @@ public class ActivityLogin extends AppCompatActivity {
                                             Log.d("LoginActivity", "User authentication successful. UserId: " + userid);
                                             login();
                                             if (rememberCond) {
+                                                db.saveUserCredentials(email, password);
                                                 SessionManager sessionManager = new SessionManager(ActivityLogin.this);
                                                 sessionManager.saveSession(userid);
+                                            } else{
+                                                db.clearUserCredentials();
                                             }
                                             Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
                                             intent.putExtra("userId", userid);

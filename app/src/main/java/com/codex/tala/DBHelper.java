@@ -2,6 +2,7 @@ package com.codex.tala;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -27,6 +28,38 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_END_TIME = "end_time";
     public static final String COLUMN_DESCRIPTION = "description";
 
+
+    private Context context; // Define the context variable
+
+    public DBHelper(Context context) {
+        super(context, DATABASE_NAME, null, 1);
+        this.context = context;
+    }
+
+    public void saveUserCredentials(String email, String password) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("email", email);
+        editor.putString("password", password);
+        editor.apply();
+    }
+
+    public String[] getUserCredentials() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        String email = sharedPreferences.getString("email", null);
+        String password = sharedPreferences.getString("password", null);
+        return new String[]{email, password};
+    }
+
+    public void clearUserCredentials() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    }
+
+
+
     public static final String CREATE_TABLE_USERS =
             "CREATE TABLE " + TABLE_USERS + "("
                     + COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -48,9 +81,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     + "FOREIGN KEY(" + COLUMN_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + ")"
                     + ")";
 
-    public DBHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
-    }
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -261,4 +292,5 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return eventExists;
     }
+
 }
