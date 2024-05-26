@@ -32,4 +32,6 @@ public class SessionManager {
         editor.putInt(SESSION_KEY, DEFAULT_USER_ID);
         editor.apply();
     }
+
+
 }

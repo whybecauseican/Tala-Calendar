@@ -78,7 +78,7 @@ public class ActivityEventAdd extends AppCompatActivity {
         endTime();
 
         rootNode = FirebaseDatabase.getInstance();
-        reference = rootNode.getReference("event");
+        reference = rootNode.getReference("events");
 
 
 
@@ -86,18 +86,31 @@ public class ActivityEventAdd extends AppCompatActivity {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 String eventName = eventNameET.getText().toString();
                 String startTime = timeStartTv.getText().toString();
                 String endTime = timeEndTv.getText().toString();
                 String description = descriptionET.getText().toString();
 
+                DatabaseReference eventsRef = rootNode.getReference("events");
+
+
+                String eventId = eventsRef.push().getKey();
                 Map<String, Object> eventData = new HashMap<>();
+
+                EventSyncManager eventSyncManager = EventSyncManager.getInstance();
+                EventSyncManager.Event event = eventSyncManager.createEvent();
+
                 eventData.put("description", description);
                 eventData.put("eventName", eventName);
                 eventData.put("startTime", startTime);
                 eventData.put("endTime", endTime);
                 eventData.put("startDate", startDateVal.toString());
                 eventData.put("endDate", endDateVal.toString());
+                eventSyncManager.syncEvent(event);
+
+
 
                 reference.child(eventName).setValue(eventData);
 
@@ -279,4 +292,6 @@ public class ActivityEventAdd extends AppCompatActivity {
         dateStartTv.setText(formattedDate);
         dateEndTv.setText(formattedDate);
     }
+
+
 }
