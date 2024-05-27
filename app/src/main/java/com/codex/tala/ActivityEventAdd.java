@@ -14,10 +14,14 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -99,8 +103,8 @@ public class ActivityEventAdd extends AppCompatActivity {
                 String eventId = eventsRef.push().getKey();
                 Map<String, Object> eventData = new HashMap<>();
 
-                EventSyncManager eventSyncManager = EventSyncManager.getInstance();
-                EventSyncManager.Event event = eventSyncManager.createEvent();
+//                EventSyncManager eventSyncManager = EventSyncManager.getInstance();
+//                EventSyncManager.Event event = eventSyncManager.createEvent();
 
                 eventData.put("description", description);
                 eventData.put("eventName", eventName);
@@ -108,7 +112,7 @@ public class ActivityEventAdd extends AppCompatActivity {
                 eventData.put("endTime", endTime);
                 eventData.put("startDate", startDateVal.toString());
                 eventData.put("endDate", endDateVal.toString());
-                eventSyncManager.syncEvent(event);
+                //eventSyncManager.syncEvent(event);
 
 
 
@@ -145,6 +149,36 @@ public class ActivityEventAdd extends AppCompatActivity {
             }
         });
     }
+
+
+//    private void syncEventsFromFirebase() {
+//        DatabaseReference userEventsRef = rootNode.getReference("events").child(String.valueOf(userId));
+//
+//        userEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+//                    String eventName = eventSnapshot.child("eventName").getValue(String.class);
+//                    String description = eventSnapshot.child("description").getValue(String.class);
+//                    String startTime = eventSnapshot.child("startTime").getValue(String.class);
+//                    String endTime = eventSnapshot.child("endTime").getValue(String.class);
+//                    String startDate = eventSnapshot.child("startDate").getValue(String.class);
+//                    String endDate = eventSnapshot.child("endDate").getValue(String.class);
+//
+//                    // Check if the event already exists in the local database
+//                    if (!db.isEventExists(userId, eventName, startDate, startTime)) {
+//                        db.insertEventData(userId, eventName, startDate, endDate, startTime, endTime, description);
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Log.e("Firebase", "Error retrieving events: " + error.getMessage());
+//            }
+//        });
+//    }
+
 
     private void startDate(){
         dateStartTv.setOnClickListener(new View.OnClickListener() {

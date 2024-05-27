@@ -21,6 +21,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ActivityLogin extends AppCompatActivity {
     private EditText mail, pass;
@@ -31,8 +36,8 @@ public class ActivityLogin extends AppCompatActivity {
 
     private DBHelper db;
     private Boolean rememberCond;
-
    private FirebaseAuth mAuth;
+    private DatabaseReference rootNode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,7 @@ public class ActivityLogin extends AppCompatActivity {
         loginBtn = findViewById(R.id.login_Btn);
         googleSignInBtn = findViewById(R.id.google_Btn);
         mAuth = FirebaseAuth.getInstance();
+        rootNode = FirebaseDatabase.getInstance().getReference();
 
         db = new DBHelper(this);
 
@@ -100,6 +106,7 @@ public class ActivityLogin extends AppCompatActivity {
                                                 // User does not exist in local DB, create an entry
                                                 db.insertUsersData(email, user.getDisplayName(), password);
                                                 userid = db.getUserId(email, password);
+                                                syncEventsFromFirebase(userid);
                                             }
                                             Log.d("LoginActivity", "User authentication successful. UserId: " + userid);
                                             login();
@@ -159,6 +166,36 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
 
+    private void syncEventsFromFirebase(int userId) {
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference userEventsRef = rootRef.child("events");
+
+        userEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+                    String eventName = eventSnapshot.child("eventName").getValue(String.class);
+                    String description = eventSnapshot.child("description").getValue(String.class);
+                    String startTime = eventSnapshot.child("startTime").getValue(String.class);
+                    String endTime = eventSnapshot.child("endTime").getValue(String.class);
+                    String startDate = eventSnapshot.child("startDate").getValue(String.class);
+                    String endDate = eventSnapshot.child("endDate").getValue(String.class);
+
+                    // Check if the event already exists in the local database
+                    if (!db.isEventExists(userId, eventName, startDate, startTime)) {
+                        db.insertEventData(userId, eventName, startDate, endDate, startTime, endTime, description);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Error retrieving events: " + error.getMessage());
+            }
+        });
+    }
+
+
 
     private void login() {
         String email = mail.getText().toString().trim();
@@ -184,4 +221,6 @@ public class ActivityLogin extends AppCompatActivity {
             Toast.makeText(ActivityLogin.this, "User is null", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 }

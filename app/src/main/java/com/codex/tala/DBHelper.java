@@ -293,4 +293,28 @@ public class DBHelper extends SQLiteOpenHelper {
         return eventExists;
     }
 
+
+    public boolean isEventExists(int userId, String title, String startDate, String startTime) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        boolean eventExists = false;
+
+        String selection = COLUMN_USER_ID + " = ? AND " + COLUMN_EVENT_TITLE + " = ? AND " + COLUMN_START_DATE + " = ? AND " + COLUMN_START_TIME + " = ?";
+        String[] selectionArgs = {String.valueOf(userId), title, startDate, startTime};
+
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_EVENTS, null, selection, selectionArgs, null, null, null);
+            eventExists = (cursor != null && cursor.getCount() > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+
+        return eventExists;
+    }
+
 }
