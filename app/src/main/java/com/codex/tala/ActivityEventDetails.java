@@ -2,19 +2,24 @@ package com.codex.tala;
 
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ActivityEventDetails extends AppCompatActivity {
     private TextView title, description, startDate, endDate, startTime, endTime, monthTv;
@@ -22,37 +27,32 @@ public class ActivityEventDetails extends AppCompatActivity {
     private LinearLayout linearLayout;
     private Button edit_event_btn, delete_event_btn;
     private int userid, eventid;
-
+    private DatabaseReference rootNode;
+    private ValueEventListener eventListener; // Declare the ValueEventListener
 
     AlertDialog.Builder builder;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
 
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        decorView.setSystemUiVisibility(uiOptions);
+        rootNode = FirebaseDatabase.getInstance().getReference();
 
         userid = getIntent().getIntExtra("userId", -1);
         eventid = getIntent().getIntExtra("eventId", -1);
 
-        linearLayout = (LinearLayout) findViewById(R.id.lin_back_btn);
-        monthTv = (TextView) findViewById(R.id.ed_month_btn);
-        edit_event_btn = (Button) findViewById(R.id.edit_event_btn);
-        delete_event_btn = (Button) findViewById(R.id.delete_event_btn);
+        linearLayout = findViewById(R.id.lin_back_btn);
+        monthTv = findViewById(R.id.ed_month_btn);
+        edit_event_btn = findViewById(R.id.edit_event_btn);
+        delete_event_btn = findViewById(R.id.delete_event_btn);
         builder = new AlertDialog.Builder(this);
-        // TODO: add the other event details in here
-        title = (TextView) findViewById(R.id.ED_event_name);
-        description = (TextView) findViewById(R.id.descriptionTV);
-        startDate = (TextView) findViewById(R.id.ED_dateStartTv);
-        endDate = (TextView) findViewById(R.id.ED_dateEndTv);
-        startTime = (TextView) findViewById(R.id.ED_timeStartTv);
-        endTime = (TextView) findViewById(R.id.ED_timeEndTv);
-
-
+        title = findViewById(R.id.ED_event_name);
+        description = findViewById(R.id.descriptionTV);
+        startDate = findViewById(R.id.ED_dateStartTv);
+        endDate = findViewById(R.id.ED_dateEndTv);
+        startTime = findViewById(R.id.ED_timeStartTv);
+        endTime = findViewById(R.id.ED_timeEndTv);
 
         db = new DBHelper(this);
         setEventDetails();
@@ -66,7 +66,7 @@ public class ActivityEventDetails extends AppCompatActivity {
             public void onClick(View v) {
                 db.close();
                 finish();
-                overridePendingTransition(0,R.anim.slide_down_anim);
+                overridePendingTransition(0, R.anim.slide_down_anim);
             }
         });
 
@@ -77,9 +77,25 @@ public class ActivityEventDetails extends AppCompatActivity {
             }
         });
 
+        DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userid));
+
+        eventListener = userEventsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Handle data changes here
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle any errors in retrieving data
+            }
+        });
+
         delete_event_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                userEventsRef.removeEventListener(eventListener); // Remove the event listener
+
                 builder.setTitle("")
                         .setMessage("Are you sure you want to delete this event?")
                         .setCancelable(true)
@@ -88,9 +104,22 @@ public class ActivityEventDetails extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 boolean isDeleted = db.deleteEventData(userid, eventid);
                                 if (isDeleted) {
-                                    Toast.makeText(ActivityEventDetails.this, "Event deleted successfully", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                    overridePendingTransition(0,R.anim.slide_down_anim);
+                                    DatabaseReference eventRef = rootNode.child("events").child(String.valueOf(userid)).child(String.valueOf(eventid));
+                                    eventRef.removeValue()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(ActivityEventDetails.this, "Event deleted successfully", Toast.LENGTH_SHORT).show();
+                                                    finish();
+                                                    overridePendingTransition(0, R.anim.slide_down_anim);
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Toast.makeText(ActivityEventDetails.this, "Failed to delete event from Firebase", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
                                 } else {
                                     Toast.makeText(ActivityEventDetails.this, "Failed to delete event", Toast.LENGTH_SHORT).show();
                                 }
@@ -103,22 +132,33 @@ public class ActivityEventDetails extends AppCompatActivity {
                             }
                         })
                         .show();
-
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Remove the event listener when the activity is destroyed
+        if (eventListener != null) {
+            DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userid));
+            userEventsRef.removeEventListener(eventListener);
+        }
     }
 
     private void setEventDetails() {
         Cursor cursor = db.getEventData(userid, eventid);
         if (cursor != null && cursor.moveToFirst()) {
             String titleCheck = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.COLUMN_EVENT_TITLE));
-            if (titleCheck.isEmpty())
+            if (titleCheck.isEmpty()) {
                 titleCheck = "(No title)";
+            }
             title.setText(titleCheck);
 
             String descCheck = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.COLUMN_DESCRIPTION));
-            if (descCheck.isEmpty())
+            if (descCheck.isEmpty()) {
                 descCheck = "Add description";
+            }
             description.setText(descCheck);
 
             String startDateStr = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.COLUMN_START_DATE));
