@@ -90,36 +90,22 @@ public class ActivityEventAdd extends AppCompatActivity {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 String eventName = eventNameET.getText().toString();
                 String startTime = timeStartTv.getText().toString();
                 String endTime = timeEndTv.getText().toString();
                 String description = descriptionET.getText().toString();
 
-                DatabaseReference eventsRef = rootNode.getReference("events");
-
-
-                String eventId = eventsRef.push().getKey();
+                DatabaseReference userEventsRef = rootNode.getReference("events").child(String.valueOf(userId));
+                String eventId = userEventsRef.push().getKey();
                 Map<String, Object> eventData = new HashMap<>();
-
-//                EventSyncManager eventSyncManager = EventSyncManager.getInstance();
-//                EventSyncManager.Event event = eventSyncManager.createEvent();
-
                 eventData.put("description", description);
                 eventData.put("eventName", eventName);
                 eventData.put("startTime", startTime);
                 eventData.put("endTime", endTime);
                 eventData.put("startDate", startDateVal.toString());
                 eventData.put("endDate", endDateVal.toString());
-                //eventSyncManager.syncEvent(event);
 
-
-
-                reference.child(eventName).setValue(eventData);
-
-
-
+                userEventsRef.child(eventName).setValue(eventData);
 
                 LocalTime sT = LocalTime.parse(CalendarUtils.convert12to24(startTime));
                 LocalTime eT = LocalTime.parse(CalendarUtils.convert12to24(endTime));
@@ -127,12 +113,12 @@ public class ActivityEventAdd extends AppCompatActivity {
                     Toast.makeText(ActivityEventAdd.this, "The event end time cannot be set before the start time.", Toast.LENGTH_SHORT).show();
                     dateEndTv.setTextColor(Color.RED);
                     timeEndTv.setTextColor(Color.RED);
-                }else{
-                    boolean insert = db.insertEventData(userId, eventName, startDateVal.toString(), endDateVal.toString(), startTime, endTime, description); //runs the inserteventdata function in the dbhelper class
+                } else {
+                    boolean insert = db.insertEventData(userId, eventName, startDateVal.toString(), endDateVal.toString(), startTime, endTime, description);
                     if (insert) {
                         db.close();
                         finish();
-                        overridePendingTransition(0,R.anim.slide_down_anim);
+                        overridePendingTransition(0, R.anim.slide_down_anim);
                     } else {
                         Toast.makeText(ActivityEventAdd.this, "Something went wrong. Please try again later", Toast.LENGTH_SHORT).show();
                     }

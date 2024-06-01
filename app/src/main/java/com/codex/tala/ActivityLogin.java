@@ -36,7 +36,7 @@ public class ActivityLogin extends AppCompatActivity {
 
     private DBHelper db;
     private Boolean rememberCond;
-   private FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
     private DatabaseReference rootNode;
 
     @Override
@@ -77,11 +77,10 @@ public class ActivityLogin extends AppCompatActivity {
             mail.setText(savedCredentials[0]);
             pass.setText(savedCredentials[1]);
             rememberMe.setChecked(true);
-        }else{
+        } else {
             db.clearUserCredentials();
         }
 
-        // feeling ko andito lang yung prob kaya ayaw mag sign and hindi ko lang makita
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,15 +105,14 @@ public class ActivityLogin extends AppCompatActivity {
                                                 // User does not exist in local DB, create an entry
                                                 db.insertUsersData(email, user.getDisplayName(), password);
                                                 userid = db.getUserId(email, password);
-                                                syncEventsFromFirebase(userid);
                                             }
                                             Log.d("LoginActivity", "User authentication successful. UserId: " + userid);
-                                            login();
+                                            syncEventsFromFirebase(userid);
                                             if (rememberCond) {
                                                 db.saveUserCredentials(email, password);
                                                 SessionManager sessionManager = new SessionManager(ActivityLogin.this);
                                                 sessionManager.saveSession(userid);
-                                            } else{
+                                            } else {
                                                 db.clearUserCredentials();
                                             }
                                             Intent intent = new Intent(ActivityLogin.this, ActivityMain.class);
@@ -137,10 +135,6 @@ public class ActivityLogin extends AppCompatActivity {
                         });
             }
         });
-
-
-
-
 
         forgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,16 +159,14 @@ public class ActivityLogin extends AppCompatActivity {
         });
     }
 
-
     private void syncEventsFromFirebase(int userId) {
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference userEventsRef = rootRef.child("events");
+        DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userId));
 
         userEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
-                    String eventName = eventSnapshot.child("eventName").getValue(String.class);
+                    String eventName = eventSnapshot.getKey(); // Changed line to use event name as key
                     String description = eventSnapshot.child("description").getValue(String.class);
                     String startTime = eventSnapshot.child("startTime").getValue(String.class);
                     String endTime = eventSnapshot.child("endTime").getValue(String.class);
@@ -194,7 +186,6 @@ public class ActivityLogin extends AppCompatActivity {
             }
         });
     }
-
 
 
     private void login() {
@@ -221,6 +212,4 @@ public class ActivityLogin extends AppCompatActivity {
             Toast.makeText(ActivityLogin.this, "User is null", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 }
