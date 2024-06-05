@@ -132,7 +132,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         db.close();
-        
+
         return userId;
     }
 
@@ -316,5 +316,41 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return eventExists;
     }
+
+
+    public void clearUserEvents(int userId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("events", "userId=?", new String[]{String.valueOf(userId)});
+    }
+
+
+//    public boolean deleteEventData(int userId, int eventId) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        return db.delete("events", "userId=? AND eventId=?", new String[]{String.valueOf(userId), String.valueOf(eventId)}) > 0;
+//    }
+//
+//    public boolean isEventExists(int userId, String eventId) {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor cursor = db.query("events", null, "userId=? AND eventId=?", new String[]{String.valueOf(userId), eventId}, null, null, null);
+//        boolean exists = cursor.getCount() > 0;
+//        cursor.close();
+//        return exists;
+//    }
+//
+//    public void insertEventData(int userId, String eventId, String eventName, String startDate, String endDate, String startTime, String endTime, String description) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//        values.put("userId", userId);
+//        values.put("eventId", eventId);
+//        values.put("eventName", eventName);
+//        values.put("startDate", startDate);
+//        values.put("endDate", endDate);
+//        values.put("startTime", startTime);
+//        values.put("endTime", endTime);
+//        values.put("description", description);
+//        db.insert("events", null, values);
+//    }
+
+
 
 }

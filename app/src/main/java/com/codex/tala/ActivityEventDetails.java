@@ -33,7 +33,7 @@ public class ActivityEventDetails extends AppCompatActivity {
     AlertDialog.Builder builder;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
 
@@ -58,6 +58,8 @@ public class ActivityEventDetails extends AppCompatActivity {
         setEventDetails();
         setupBtnClickListeners();
         db.close();
+
+        setupRealTimeListener(); // Call setupRealTimeListener() in onCreate() or a similar lifecycle method
     }
 
     private void setupBtnClickListeners() {
@@ -77,24 +79,12 @@ public class ActivityEventDetails extends AppCompatActivity {
             }
         });
 
-        DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userid));
-
-        eventListener = userEventsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Handle data changes here
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle any errors in retrieving data
-            }
-        });
-
         delete_event_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                userEventsRef.removeEventListener(eventListener); // Remove the event listener
+                // Remove the event listener before performing delete
+                DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userid));
+                userEventsRef.removeEventListener(eventListener);
 
                 builder.setTitle("")
                         .setMessage("Are you sure you want to delete this event?")
@@ -102,27 +92,7 @@ public class ActivityEventDetails extends AppCompatActivity {
                         .setPositiveButton("Delete Event", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                boolean isDeleted = db.deleteEventData(userid, eventid);
-                                if (isDeleted) {
-                                    DatabaseReference eventRef = rootNode.child("events").child(String.valueOf(userid)).child(String.valueOf(eventid));
-                                    eventRef.removeValue()
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Toast.makeText(ActivityEventDetails.this, "Event deleted successfully", Toast.LENGTH_SHORT).show();
-                                                    finish();
-                                                    overridePendingTransition(0, R.anim.slide_down_anim);
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Toast.makeText(ActivityEventDetails.this, "Failed to delete event from Firebase", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                } else {
-                                    Toast.makeText(ActivityEventDetails.this, "Failed to delete event", Toast.LENGTH_SHORT).show();
-                                }
+                                deleteEvent(String.valueOf(eventid));
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -143,6 +113,57 @@ public class ActivityEventDetails extends AppCompatActivity {
         if (eventListener != null) {
             DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userid));
             userEventsRef.removeEventListener(eventListener);
+        }
+    }
+
+    // Add this method to set up the real-time listener
+    private void setupRealTimeListener() {
+        DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userid));
+        eventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Handle the event data changes
+                if (dataSnapshot.exists()) {
+                    // Update UI with the latest data
+                    // This will ensure that any changes are reflected in real-time
+                } else {
+                    // Handle the case when data is deleted
+                    // Maybe update the UI accordingly
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle possible errors
+            }
+        };
+        userEventsRef.addValueEventListener(eventListener);
+    }
+
+    private void deleteEvent(String eventId) {
+        // Remove from local database
+        boolean isDeleted = db.deleteEventData(userid, Integer.parseInt(eventId));
+        if (isDeleted) {
+            // Remove from Firebase
+            DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userid));
+            userEventsRef.child(eventId).removeValue()
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(ActivityEventDetails.this, "Event deleted successfully", Toast.LENGTH_SHORT).show();
+                            // Finish the activity
+                            finish();
+                            overridePendingTransition(0, R.anim.slide_down_anim);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(ActivityEventDetails.this, "Failed to delete event from Firebase", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            Toast.makeText(ActivityEventDetails.this, "Failed to delete event", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -159,7 +159,8 @@ public class ActivityLogin extends AppCompatActivity {
         });
     }
 
-    private void syncEventsFromFirebase(int userId) {
+    //original code
+   /* private void syncEventsFromFirebase(int userId) {
         DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userId));
 
         userEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -185,7 +186,37 @@ public class ActivityLogin extends AppCompatActivity {
                 Log.e("Firebase", "Error retrieving events: " + error.getMessage());
             }
         });
+    }*/
+
+    //test code
+    private void syncEventsFromFirebase(int userId) {
+        DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userId));
+
+        userEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+                    String eventName = eventSnapshot.getKey(); // Ensure correct key usage
+                    String description = eventSnapshot.child("description").getValue(String.class);
+                    String startTime = eventSnapshot.child("startTime").getValue(String.class);
+                    String endTime = eventSnapshot.child("endTime").getValue(String.class);
+                    String startDate = eventSnapshot.child("startDate").getValue(String.class);
+                    String endDate = eventSnapshot.child("endDate").getValue(String.class);
+
+                    if (!db.isEventExists(userId, eventName, startDate, startTime)) {
+                        db.insertEventData(userId, eventName, startDate, endDate, startTime, endTime, description);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Error retrieving events: " + error.getMessage());
+            }
+        });
     }
+
+
 
 
     private void login() {
