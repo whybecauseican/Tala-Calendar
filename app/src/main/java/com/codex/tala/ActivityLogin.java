@@ -119,6 +119,8 @@ public class ActivityLogin extends AppCompatActivity {
                                             intent.putExtra("userId", userid);
                                             startActivity(intent);
                                             finish();
+                                            // Delete event here
+                                            deleteEventFromFirebase(userid, "eventNameToDelete");
                                         } else {
                                             Log.d("LoginActivity", "Email not verified");
                                             Toast.makeText(ActivityLogin.this, "Please verify your email first", Toast.LENGTH_SHORT).show();
@@ -160,7 +162,7 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     //original code
-   /* private void syncEventsFromFirebase(int userId) {
+   /*private void syncEventsFromFirebase(int userId) {
         DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userId));
 
         userEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -189,7 +191,7 @@ public class ActivityLogin extends AppCompatActivity {
     }*/
 
     //test code
-    private void syncEventsFromFirebase(int userId) {
+   private void syncEventsFromFirebase(int userId) {
         DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userId));
 
         userEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -212,6 +214,28 @@ public class ActivityLogin extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e("Firebase", "Error retrieving events: " + error.getMessage());
+            }
+        });
+    }
+
+
+    private void deleteEventFromFirebase(int userId, String eventName) {
+        DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userId)).child(eventName);
+        userEventsRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d("Firebase", "Event deleted successfully");
+                    // Delete event from local database
+                    boolean isDeletedLocal = db.deleteEventData(eventName); // Pass eventName instead of userId
+                    if (isDeletedLocal) {
+                        Log.d("LocalDatabase", "Event deleted successfully from local database");
+                    } else {
+                        Log.e("LocalDatabase", "Failed to delete event from local database");
+                    }
+                } else {
+                    Log.e("Firebase", "Failed to delete event: " + task.getException().getMessage());
+                }
             }
         });
     }

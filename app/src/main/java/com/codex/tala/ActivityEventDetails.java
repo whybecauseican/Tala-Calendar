@@ -92,7 +92,7 @@ public class ActivityEventDetails extends AppCompatActivity {
                         .setPositiveButton("Delete Event", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                deleteEvent(String.valueOf(eventid));
+                                deleteEvent(eventid);
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -104,6 +104,7 @@ public class ActivityEventDetails extends AppCompatActivity {
                         .show();
             }
         });
+
     }
 
     @Override
@@ -140,13 +141,14 @@ public class ActivityEventDetails extends AppCompatActivity {
         userEventsRef.addValueEventListener(eventListener);
     }
 
-    private void deleteEvent(String eventId) {
+    private void deleteEvent(int eventId) {
         // Remove from local database
-        boolean isDeleted = db.deleteEventData(userid, Integer.parseInt(eventId));
+        boolean isDeleted = db.deleteEventData(userid, eventId);
+
         if (isDeleted) {
             // Remove from Firebase
-            DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userid));
-            userEventsRef.child(eventId).removeValue()
+            DatabaseReference userEventsRef = rootNode.child("events").child(String.valueOf(userid)).child(String.valueOf(eventId));
+            userEventsRef.removeValue()
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -166,6 +168,7 @@ public class ActivityEventDetails extends AppCompatActivity {
             Toast.makeText(ActivityEventDetails.this, "Failed to delete event", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void setEventDetails() {
         Cursor cursor = db.getEventData(userid, eventid);

@@ -6,10 +6,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "Tala.db";
@@ -271,6 +269,10 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
+
+
+
+
     public boolean checkCalendarEventExists(int userId, LocalDate date) {
         SQLiteDatabase db = this.getReadableDatabase();
         boolean eventExists = false;
@@ -323,33 +325,26 @@ public class DBHelper extends SQLiteOpenHelper {
         db.delete("events", "userId=?", new String[]{String.valueOf(userId)});
     }
 
+    public void clearAllEvents(int userId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_EVENTS, COLUMN_USER_ID + " = ?", new String[]{String.valueOf(userId)});
+        db.close();
+    }
 
-//    public boolean deleteEventData(int userId, int eventId) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        return db.delete("events", "userId=? AND eventId=?", new String[]{String.valueOf(userId), String.valueOf(eventId)}) > 0;
-//    }
-//
-//    public boolean isEventExists(int userId, String eventId) {
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor cursor = db.query("events", null, "userId=? AND eventId=?", new String[]{String.valueOf(userId), eventId}, null, null, null);
-//        boolean exists = cursor.getCount() > 0;
-//        cursor.close();
-//        return exists;
-//    }
-//
-//    public void insertEventData(int userId, String eventId, String eventName, String startDate, String endDate, String startTime, String endTime, String description) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        values.put("userId", userId);
-//        values.put("eventId", eventId);
-//        values.put("eventName", eventName);
-//        values.put("startDate", startDate);
-//        values.put("endDate", endDate);
-//        values.put("startTime", startTime);
-//        values.put("endTime", endTime);
-//        values.put("description", description);
-//        db.insert("events", null, values);
-//    }
+    public boolean deleteEventData(String eventName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selection = COLUMN_EVENT_TITLE + " = ?";
+        String[] selectionArgs = {eventName};
+        int deletedRows = db.delete(TABLE_EVENTS, selection, selectionArgs);
+        db.close();
+        return deletedRows > 0;
+    }
+
+    public void deleteEvent(int userId, int eventId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("events", "userid=? AND eventid=?", new String[]{String.valueOf(userId), String.valueOf(eventId)});
+        db.close();
+    }
 
 
 
